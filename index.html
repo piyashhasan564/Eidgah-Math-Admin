@@ -1,0 +1,1079 @@
+
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>অ্যাডমিন ড্যাশবোর্ড - ঈদগাহ ফান্ড</title>
+    
+    <!-- গুগল ফন্ট ও ফন্ট-অসাম -->
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- SheetJS (Excel Download) -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
+    <style>
+        body { font-family: 'Hind Siliguri', sans-serif; background-color: #f3f4f6; }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <!-- ================= লগইন স্ক্রিন ================= -->
+    <div id="loginScreen" class="min-h-screen flex items-center justify-center bg-emerald-700 px-4">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md text-center">
+            <i class="fas fa-user-shield text-5xl text-emerald-600 mb-4"></i>
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">অ্যাডমিন প্যানেল</h2>
+            <div class="mb-4">
+                <input type="password" id="adminPass" placeholder="পাসওয়ার্ড দিন" class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-emerald-500 text-lg text-center" onkeypress="handleEnter(event)">
+            </div>
+            <button onclick="checkLogin()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-lg transition duration-300">
+                লগইন করুন
+            </button>
+        </div>
+    </div>
+
+    <!-- ================= মূল ড্যাশবোর্ড ================= -->
+    <div id="dashboardScreen" class="hidden min-h-screen">
+        
+        <!-- টপ নেভিগেশন -->
+        <nav class="bg-emerald-700 text-white shadow-lg">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+                <div class="text-xl font-bold flex items-center gap-2">
+                    <i class="fas fa-mosque"></i> ঈদগাহ ফান্ড ড্যাশবোর্ড
+                </div>
+                <!-- বাটন গ্রুপ -->
+                <div class="flex items-center gap-3">
+                    <button onclick="openSettings()" class="bg-blue-600 hover:bg-blue-700 px-3 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition shadow-md" title="সেটিংস">
+                        <i class="fas fa-cog text-lg"></i>
+                    </button>
+                    <button onclick="logout()" class="bg-red-500 hover:bg-red-600 px-3 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition shadow-md">
+                        <i class="fas fa-sign-out-alt"></i> <span class="hidden sm:inline">লগআউট</span>
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            
+            <!-- স্ট্যাটাস কার্ডস -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
+                <!-- মোট সংগ্রহ -->
+                <div class="bg-white rounded-xl shadow-sm p-4 sm:p-6 border-l-4 border-emerald-500 flex flex-col sm:flex-row items-start sm:items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-xs sm:text-sm font-medium">মোট সংগ্রহ</p>
+                        <h3 class="text-xl sm:text-3xl font-bold text-gray-800 mt-1" id="totalRaised">৳০</h3>
+                    </div>
+                    <div class="hidden sm:flex w-10 h-10 sm:w-12 sm:h-12 bg-emerald-100 rounded-full items-center justify-center text-emerald-600 text-lg sm:text-2xl mt-2 sm:mt-0">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                </div>
+
+                <!-- পেন্ডিং রিকোয়েস্ট -->
+                <div class="bg-white rounded-xl shadow-sm p-4 sm:p-6 border-l-4 border-amber-500 flex flex-col sm:flex-row items-start sm:items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-xs sm:text-sm font-medium">অপেক্ষমাণ</p>
+                        <h3 class="text-xl sm:text-3xl font-bold text-gray-800 mt-1" id="pendingCount">০</h3>
+                    </div>
+                    <div class="hidden sm:flex w-10 h-10 sm:w-12 sm:h-12 bg-amber-100 rounded-full items-center justify-center text-amber-600 text-lg sm:text-2xl mt-2 sm:mt-0">
+                        <i class="fas fa-hourglass-half"></i>
+                    </div>
+                </div>
+
+                <!-- মোট ডোনার (যারা টাকা দিয়েছে) -->
+                <div class="bg-white rounded-xl shadow-sm p-4 sm:p-6 border-l-4 border-blue-500 flex flex-col sm:flex-row items-start sm:items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-xs sm:text-sm font-medium">মোট দাতা</p>
+                        <h3 class="text-xl sm:text-3xl font-bold text-gray-800 mt-1" id="approvedCount">০</h3>
+                    </div>
+                    <div class="hidden sm:flex w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-full items-center justify-center text-blue-600 text-lg sm:text-2xl mt-2 sm:mt-0">
+                        <i class="fas fa-hand-holding-heart"></i>
+                    </div>
+                </div>
+
+                <!-- মোট ইউজার (নতুন বক্স - যারা রেজিস্টার করেছে) -->
+                <div class="bg-white rounded-xl shadow-sm p-4 sm:p-6 border-l-4 border-purple-500 flex flex-col sm:flex-row items-start sm:items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-xs sm:text-sm font-medium">রেজিস্টার্ড ইউজার</p>
+                        <h3 class="text-xl sm:text-3xl font-bold text-gray-800 mt-1" id="totalUsersCount">০</h3>
+                    </div>
+                    <div class="hidden sm:flex w-10 h-10 sm:w-12 sm:h-12 bg-purple-100 rounded-full items-center justify-center text-purple-600 text-lg sm:text-2xl mt-2 sm:mt-0">
+                        <i class="fas fa-users"></i>
+                    </div>
+                </div>
+            
+            </div>
+
+            <!-- ================= সেটিংস মোডাল (পপ-আপ) ================= -->
+            <div id="settingsModal" class="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center hidden backdrop-blur-sm px-4">
+                <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-lg relative transform transition-all max-h-[90vh] overflow-y-auto">
+                    <!-- ক্লোজ বাটন -->
+                    <button onclick="closeSettings()" class="absolute top-4 right-4 text-gray-400 hover:text-red-500 transition text-2xl">
+                        <i class="fas fa-times-circle"></i>
+                    </button>
+                    
+                    <h3 class="text-xl font-bold text-gray-800 mb-6 border-b pb-3"><i class="fas fa-cogs text-blue-500 mr-2"></i> সেটিংস ও আপডেট</h3>
+                    
+                    <div class="space-y-5">
+                        <!-- ফান্ড স্ট্যাটাস শো/হাইড টগল -->
+                        <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 flex justify-between items-center">
+                            <div>
+                                <h4 class="font-bold text-gray-800 text-sm">লক্ষ্যমাত্রা ও প্রোগ্রেস বার দেখান</h4>
+                                <p class="text-xs text-gray-500">বন্ধ করলে বর্তমান লক্ষ্যমাত্রাটি 'Targets' ট্যাবে সেভ হয়ে যাবে।</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="adminShowTarget" class="sr-only peer" onchange="toggleTargetProgress(this.checked)">
+                                <div class="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                            </label>
+                        </div>
+                        
+                        <!-- লক্ষ্যমাত্রার মেসেজ -->
+                        <div class="bg-blue-50 p-3 rounded-lg border border-blue-100">
+                            <label class="block text-sm font-bold text-gray-700 mb-2">বিজ্ঞপ্তি বা মেসেজ (ইউজার প্যানেলে দেখাবে)</label>
+                            <div class="flex gap-2">
+                                <textarea id="adminMessage" rows="2" class="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 transition text-sm" placeholder="যেমন: মসজিদের ছাদ ঢালাইয়ের জন্য ফান্ড সংগ্রহ..."></textarea>
+                                <button onclick="updateSingleSetting('message', 'adminMessage')" class="bg-blue-600 hover:bg-blue-700 text-white px-4 rounded-lg font-bold transition flex items-center justify-center shrink-0">
+                                    সেভ
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- বিকাশ -->
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">বিকাশ নাম্বার</label>
+                            <div class="flex gap-2">
+                                <input type="text" id="adminBkash" class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-pink-500 transition">
+                                <button onclick="updateSingleSetting('bkash', 'adminBkash')" class="bg-pink-600 hover:bg-pink-700 text-white px-5 rounded-lg font-bold transition shrink-0">
+                                    সেভ
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- নগদ -->
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">নগদ নাম্বার</label>
+                            <div class="flex gap-2">
+                                <input type="text" id="adminNagad" class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-orange-500 transition">
+                                <button onclick="updateSingleSetting('nagad', 'adminNagad')" class="bg-orange-500 hover:bg-orange-600 text-white px-5 rounded-lg font-bold transition shrink-0">
+                                    সেভ
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- রকেট -->
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1">রকেট নাম্বার</label>
+                            <div class="flex gap-2">
+                                <input type="text" id="adminRocket" class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-purple-500 transition">
+                                <button onclick="updateSingleSetting('rocket', 'adminRocket')" class="bg-purple-600 hover:bg-purple-700 text-white px-5 rounded-lg font-bold transition shrink-0">
+                                    সেভ
+                                </button>
+                            </div>
+                        </div>
+                        <!-- অ্যাডমিন পাসওয়ার্ড পরিবর্তন -->
+                        <div class="mt-4 pt-4 border-t border-gray-200">
+                            <label class="block text-sm font-bold text-red-600 mb-1"><i class="fas fa-key"></i> অ্যাডমিন পাসওয়ার্ড পরিবর্তন</label>
+                            <div class="flex gap-2">
+                                <input type="text" id="adminNewPass" class="w-full px-4 py-2 border-2 border-red-200 rounded-lg focus:outline-none focus:border-red-500 transition" placeholder="নতুন পাসওয়ার্ড দিন (ডিফল্ট: 12345)">
+                                <button onclick="updateSingleSetting('adminPassword', 'adminNewPass')" class="bg-red-600 hover:bg-red-700 text-white px-5 rounded-lg font-bold transition shrink-0">
+                                    পরিবর্তন
+                                </button>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    
+                    <div class="mt-6 text-right">
+                        <button onclick="closeSettings()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-6 py-2 rounded-lg font-bold transition">বন্ধ করুন</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ডাটা টেবিল সেকশন -->
+            <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                <div class="border-b border-gray-200 bg-gray-50 p-4 flex justify-between items-center">
+                    <h3 id="tableMainTitle" class="text-lg font-bold text-gray-800"><i class="fas fa-list-alt text-emerald-600 mr-2"></i> অনুদানের তালিকা</h3>
+                    
+                    <!-- ফিল্টার বাটন -->
+                    <div class="flex bg-gray-200 rounded-lg p-1">
+                        <button onclick="setFilter('pending')" id="btnPending" class="px-3 sm:px-4 py-1.5 rounded-md text-xs sm:text-sm font-semibold bg-white shadow text-emerald-700 transition">Pending</button>
+                        <button onclick="setFilter('users')" id="btnUsers" class="px-3 sm:px-4 py-1.5 rounded-md text-xs sm:text-sm font-semibold text-gray-600 hover:text-gray-800 transition">Users</button>
+                        <button onclick="setFilter('targets')" id="btnTargets" class="px-3 sm:px-4 py-1.5 rounded-md text-xs sm:text-sm font-semibold text-gray-600 hover:text-gray-800 transition">Targets</button>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead id="adminTableHead">
+                            <!-- JS এর মাধ্যমে ডাইনামিক হেডার আসবে -->
+                        </thead>
+                        <tbody id="adminTableBody" class="divide-y divide-gray-100">
+                            <!-- Data will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase & Logic Scripts -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getFirestore, collection, onSnapshot, query, orderBy, doc, updateDoc, deleteDoc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        // ==========================================
+        // আপনার ফায়ারবেস Config
+        // ==========================================
+        
+const firebaseConfig = {
+  apiKey: "AIzaSyCRNQ7XYOyNzH87GEGWl3KfqheXrsJ7j2c",
+  authDomain: "eidgah-509af.firebaseapp.com",
+  projectId: "eidgah-509af",
+  storageBucket: "eidgah-509af.firebasestorage.app",
+  messagingSenderId: "622747164578",
+  appId: "1:622747164578:web:3b794e9a7d064d2553dcfb",
+  measurementId: "G-VE5ER4RZLW"
+};
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // গ্লোবাল ভেরিয়েবল
+        window.allDonations = [];
+        window.allPastTargets = [];
+        window.activeTargetInfo = null; 
+        window.currentFilter = 'pending';
+        window.allUsersData = [];
+
+        // ডাটাবেস থেকে রিয়ে-টাইম ডাটা ফেচিং
+        const q = query(collection(db, "donations"), orderBy("timestamp", "desc"));
+        onSnapshot(q, (snapshot) => {
+    window.allDonations = [];
+    let totalTaka = 0;
+    let pendingReq = 0;
+    
+    // ৩ দিনের হিসাব করার জন্য
+    const now = new Date().getTime();
+    const sevenDaysInMs = 3 * 24 * 60 * 60 * 1000;
+
+    snapshot.forEach((docSnapshot) => {
+        const data = docSnapshot.data();
+        data.id = docSnapshot.id; 
+
+        // === ৩ দিন পর অটো ডিলিট লজিক ===
+        if (data.status === "rejected" && data.rejectedAt) {
+            const rejectTime = data.rejectedAt.toDate().getTime();
+            if (now - rejectTime > sevenDaysInMs) {
+                deleteDoc(doc(db, "donations", data.id)); // ৩ দিন পার হলে সাইলেন্টলি ডাটাবেস থেকে ডিলিট হয়ে যাবে
+                return; // লিস্টে আর যুক্ত হবে না
+            }
+        }
+
+        window.allDonations.push(data);
+
+        // স্ট্যাটাস অনুযায়ী কাউন্ট
+        if (data.status === "approved") {
+            totalTaka += data.amount;
+        } else if (data.status === "pending") { // rejected গুলো যেন pending এ কাউন্ট না হয়
+            pendingReq++;
+        }
+    });
+
+            document.getElementById('totalRaised').innerText = '৳' + totalTaka.toLocaleString('en-IN');
+            document.getElementById('pendingCount').innerText = pendingReq;
+            
+            // ইউনিক ডোনার কাউন্ট
+            const uniqueApprovedDonors = new Set(window.allDonations.filter(d => d.status === 'approved').map(d => d.mobile));
+            document.getElementById('approvedCount').innerText = uniqueApprovedDonors.size;
+
+            window.renderTable();
+        });
+
+        // অতীতের লক্ষ্যমাত্রা ফেচিং
+        const qTargets = query(collection(db, "past_targets"), orderBy("timestamp", "desc"));
+        onSnapshot(qTargets, (snapshot) => {
+            window.allPastTargets = [];
+            snapshot.forEach((docSnap) => {
+                const data = docSnap.data();
+                data.id = docSnap.id;
+                window.allPastTargets.push(data);
+            });
+            if(window.currentFilter === 'targets') window.renderTable();
+        });
+// ফায়ারবেস থেকে সব রেজিস্টার্ড ইউজার ফেচিং
+        onSnapshot(collection(db, "users"), (snapshot) => {
+            window.allUsersData = [];
+            snapshot.forEach((docSnap) => {
+                window.allUsersData.push(docSnap.data());
+            });
+            // মোট ইউজারের সংখ্যা বক্সে দেখানো
+            document.getElementById('totalUsersCount').innerText = window.allUsersData.length;
+            
+            if(window.currentFilter === 'users') window.renderTable();
+        });
+        // রিয়েলটাইম সেটিংস ডাটা লোড
+        onSnapshot(doc(db, "settings", "general_settings"), (docSnap) => {
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                
+                document.getElementById('adminBkash').value = data.bkash || "";
+                document.getElementById('adminNagad').value = data.nagad || "";
+                document.getElementById('adminRocket').value = data.rocket || "";
+                document.getElementById('adminMessage').value = data.message || "";
+                
+                document.getElementById('adminShowTarget').checked = data.showTargetProgress !== false; 
+                
+                if (data.showTargetProgress && data.targetSessionId) {
+                    window.activeTargetInfo = {
+                        reason: data.targetReason,
+                        amount: data.target,
+                        sessionId: data.targetSessionId
+                    };
+                } else {
+                    window.activeTargetInfo = null;
+                }
+                
+                if(window.currentFilter === 'targets') window.renderTable();
+            }
+        });
+
+        // টেবিল রেন্ডার ফাংশন
+        window.renderTable = function() {
+            const tbody = document.getElementById('adminTableBody');
+            const thead = document.getElementById('adminTableHead');
+            tbody.innerHTML = '';
+            thead.innerHTML = '';
+
+            // ---- PENDING TAB ----
+            if (window.currentFilter === 'pending') {
+                thead.innerHTML = `
+                    <tr class="bg-gray-50 text-gray-600 text-[11px] sm:text-sm border-b">
+                        <th class="px-2 py-3 sm:p-4 font-semibold">নাম ও মোবাইল</th>
+                        <th class="px-2 py-3 sm:p-4 font-semibold text-center">মাধ্যম ও TrxID</th>
+                        <th class="px-2 py-3 sm:p-4 font-semibold text-right">পরিমাণ</th>
+                        <th class="px-1 py-3 sm:p-4 font-semibold text-center">অ্যাকশন</th>
+                    </tr>
+                `;
+
+                const pendingData = window.allDonations.filter(d => d.status === 'pending');
+
+                if (pendingData.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-gray-500 font-medium">কোনো অপেক্ষমাণ (Pending) রিকোয়েস্ট নেই।</td></tr>`;
+                    return;
+                }
+
+                pendingData.forEach(data => {
+                    let methodColor = "bg-gray-100 text-gray-800";
+                    if(data.method === 'বিকাশ') methodColor = "bg-pink-100 text-pink-700";
+                    if(data.method === 'নগদ') methodColor = "bg-orange-100 text-orange-700";
+                    if(data.method === 'রকেট') methodColor = "bg-purple-100 text-purple-700";
+                    if(data.method === 'ক্যাশ') methodColor = "bg-green-100 text-green-700";
+
+                    const mobileText = data.mobile ? data.mobile : "নম্বর নেই"; 
+                    const adminAvatar = data.photo && data.photo !== "" 
+                        ? `<img src="${data.photo}" onclick="viewFullImage('${data.photo}')" class="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover border border-gray-200 shadow-sm mr-2 sm:mr-3 cursor-pointer hover:opacity-80 transition hover:ring-2 hover:ring-emerald-400 shrink-0">` 
+                        : `<div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 mr-2 sm:mr-3 shrink-0"><i class="fas fa-user text-xs sm:text-base"></i></div>`;
+
+                    const targetBadge = data.isTargetDonation ? `<span class="bg-amber-100 text-amber-700 text-[9px] sm:text-[10px] px-1.5 py-0.5 rounded-full mt-1 sm:mt-0 sm:ml-2 inline-block whitespace-nowrap" title="লক্ষ্যমাত্রায় জমা হয়েছে">Target</span>` : '';
+
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-gray-50 transition text-xs sm:text-base";
+                    tr.innerHTML = `
+                        <td class="px-2 py-3 sm:p-4 border-b">
+                            <div class="flex items-center">
+                                ${adminAvatar}
+                                <div>
+                                    <div class="font-bold text-gray-800 flex flex-col sm:flex-row sm:items-center leading-tight">
+                                        <span>${data.name}</span> 
+                                        ${targetBadge}
+                                    </div>
+                                    <div class="text-[10px] sm:text-sm text-gray-500 mt-0.5 sm:mt-1"><i class="fas fa-phone-alt text-[9px] sm:text-xs mr-1"></i>${mobileText}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-2 py-3 sm:p-4 border-b text-center align-middle">
+                            <span class="inline-block px-1.5 py-0.5 sm:px-2 sm:py-1 rounded text-[10px] sm:text-xs font-bold ${methodColor} mb-1">${data.method}</span>
+                            <div class="text-[9px] sm:text-xs text-gray-500 font-mono break-all line-clamp-2">${data.trxId}</div>
+                        </td>
+                        <td class="px-2 py-3 sm:p-4 border-b text-right font-bold text-sm sm:text-lg text-emerald-700 align-middle">
+                            ৳${data.amount.toLocaleString('en-IN')}
+                        </td>
+                        <td class="px-1 py-3 sm:p-4 border-b text-center align-middle">
+                            <div class="flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-2">
+                                <button onclick="approveData('${data.id}')" class="bg-emerald-500 hover:bg-emerald-600 text-white w-6 h-6 sm:w-8 sm:h-8 rounded-full shadow transition flex items-center justify-center" title="Approve"><i class="fas fa-check text-[10px] sm:text-base"></i></button>
+                                <button onclick="deleteData('${data.id}')" class="bg-red-500 hover:bg-red-600 text-white w-6 h-6 sm:w-8 sm:h-8 rounded-full shadow transition flex items-center justify-center" title="Reject"><i class="fas fa-times text-[10px] sm:text-base"></i></button>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } 
+            // ---- USERS TAB ----
+            else if (window.currentFilter === 'users') {
+                thead.innerHTML = `
+                    <tr class="bg-gray-50 text-gray-600 text-[11px] sm:text-sm border-b">
+                        <th class="px-2 py-3 sm:p-4 font-semibold">ইউজারের তথ্য</th>
+                        <th class="px-2 py-3 sm:p-4 font-semibold text-center">মোট অনুদান</th>
+                        <th class="px-2 py-3 sm:p-4 font-semibold text-center">অ্যাকশন</th>
+                    </tr>
+                `;
+
+                // প্রথমে অনুদানগুলোর হিসাব বের করা
+                const userDonationMap = {};
+                window.allDonations.forEach(d => {
+                    if (d.status !== 'approved') return;
+                    if (!userDonationMap[d.mobile]) {
+                        userDonationMap[d.mobile] = { amount: 0, count: 0 };
+                    }
+                    userDonationMap[d.mobile].amount += d.amount;
+                    userDonationMap[d.mobile].count += 1;
+                });
+
+                // ডাটাবেসের সব রেজিস্টার্ড ইউজারদের সাথে অনুদানের হিসাব মেলানো
+                let usersArray = window.allUsersData.map(u => {
+                    let donInfo = userDonationMap[u.mobile] || { amount: 0, count: 0 };
+                    return {
+                        name: u.name,
+                        mobile: u.mobile,
+                        photo: u.photo,
+                        totalAmount: donInfo.amount,
+                        donationsCount: donInfo.count
+                    };
+                });
+
+                // কেউ যদি রেজিস্টার না করে সরাসরি অনুদান দিয়ে থাকে (অ্যাডমিনের মাধ্যমে), তাদেরও লিস্টে যোগ করা
+                const registeredMobiles = new Set(window.allUsersData.map(u => u.mobile));
+                for (let mobile in userDonationMap) {
+                    if (!registeredMobiles.has(mobile)) {
+                        let donRecord = window.allDonations.find(d => d.mobile === mobile);
+                        usersArray.push({
+                            name: donRecord ? donRecord.name : 'অজ্ঞাত',
+                            mobile: mobile,
+                            photo: donRecord ? donRecord.photo : '',
+                            totalAmount: userDonationMap[mobile].amount,
+                            donationsCount: userDonationMap[mobile].count
+                        });
+                    }
+                }
+
+                // সাজানো: যারা টাকা দিয়েছে তারা উপরে থাকবে, যারা দেয় নাই তারা নিচে থাকবে
+                usersArray.sort((a, b) => b.totalAmount - a.totalAmount);
+
+                if (usersArray.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="3" class="p-8 text-center text-gray-500 font-medium">কোনো ইউজার নেই।</td></tr>`;
+                    return;
+                }
+
+                usersArray.forEach(u => {
+                    const adminAvatar = u.photo && u.photo !== "" 
+                        ? `<img src="${u.photo}" onclick="viewFullImage('${u.photo}')" class="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover border border-gray-200 shadow-sm mr-2 sm:mr-3 cursor-pointer hover:opacity-80 transition hover:ring-2 hover:ring-emerald-400 shrink-0">` 
+                        : `<div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 mr-2 sm:mr-3 shrink-0"><i class="fas fa-user text-xs sm:text-base"></i></div>`;
+
+                    // যদি কেউ টাকা না দিয়ে থাকে, তাহলে স্টাইল একটু ভিন্ন হবে
+                    const amountColor = u.totalAmount > 0 ? "text-emerald-700" : "text-gray-400";
+                    const isZero = u.totalAmount === 0;
+
+                    const tr = document.createElement('tr');
+                    tr.className = `hover:bg-gray-50 transition text-xs sm:text-base ${isZero ? 'bg-gray-50/50' : ''}`;
+                    tr.innerHTML = `
+                        <td class="px-2 py-3 sm:p-4 border-b">
+                            <div class="flex items-center">
+                                ${adminAvatar}
+                                <div>
+                                    <div class="font-bold text-gray-800 leading-tight flex items-center gap-2">
+                                        ${u.name}
+                                        ${isZero ? '<span class="bg-gray-200 text-gray-600 text-[9px] px-1.5 rounded-full font-normal">No Donation</span>' : ''}
+                                    </div>
+                                    <div class="text-[10px] sm:text-sm text-gray-500 mt-0.5 sm:mt-1"><i class="fas fa-phone-alt text-[9px] sm:text-xs mr-1"></i>${u.mobile}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-2 py-3 sm:p-4 border-b text-center align-middle">
+                            <div class="font-bold text-sm sm:text-lg ${amountColor} mb-1">৳${u.totalAmount.toLocaleString('en-IN')}</div>
+                            <div class="text-[9px] sm:text-[11px] text-gray-500 font-semibold bg-gray-100 inline-block px-1.5 py-0.5 sm:px-2 rounded-full">${u.donationsCount} বার অনুদান</div>
+                        </td>
+                        <td class="px-2 py-3 sm:p-4 border-b text-center align-middle">
+                            <button onclick="viewUserHistory('${u.mobile}')" class="${isZero ? 'opacity-50 cursor-not-allowed bg-gray-100 border-gray-200 text-gray-400' : 'bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-600'} px-2 py-1 sm:px-3 sm:py-1.5 rounded shadow-sm text-[10px] sm:text-sm font-semibold transition flex items-center justify-center mx-auto gap-1" ${isZero ? 'disabled' : ''}>
+                                <i class="fas fa-history"></i> <span class="hidden sm:inline">হিস্ট্রি</span>
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+            // ---- TARGETS (SPLIT VIEW) TAB ----
+            else if (window.currentFilter === 'targets') {
+                let contentHtml = '';
+
+                // === ১. চলমান লক্ষ্যমাত্রা সেকশন ===
+                contentHtml += `
+                    <tr>
+                        <td colspan="3" class="bg-blue-50 px-4 py-2 text-sm font-bold text-blue-800 border-y border-blue-200">
+                            <i class="fas fa-spinner fa-spin mr-1"></i> চলমান লক্ষ্যমাত্রা (Active)
+                        </td>
+                    </tr>
+                    <tr class="bg-gray-100 text-gray-600 text-[11px] sm:text-sm border-b">
+                        <th class="px-2 py-2 sm:p-3 font-semibold">লক্ষ্যমাত্রার নাম</th>
+                        <th class="px-2 py-2 sm:p-3 font-semibold text-center">পরিমাণ</th>
+                        <th class="px-2 py-2 sm:p-3 font-semibold text-center">অ্যাকশন</th>
+                    </tr>
+                `;
+
+                if (window.activeTargetInfo) {
+                    contentHtml += `
+                        <tr class="hover:bg-blue-50 transition text-xs sm:text-base border-b bg-white">
+                            <td class="px-2 py-3 sm:p-4">
+                                <div class="font-bold text-gray-800"><i class="fas fa-bullseye text-blue-500 mr-1"></i> ${window.activeTargetInfo.reason}</div>
+                            </td>
+                            <td class="px-2 py-3 sm:p-4 text-center align-middle">
+                                <div class="font-bold text-sm sm:text-lg text-blue-700">৳${window.activeTargetInfo.amount.toLocaleString('en-IN')}</div>
+                            </td>
+                            <td class="px-2 py-3 sm:p-4 text-center align-middle">
+                                <div class="flex justify-center gap-2">
+                                    <button onclick="viewTargetDetails('${window.activeTargetInfo.sessionId}', '${window.activeTargetInfo.reason}', ${window.activeTargetInfo.amount})" class="bg-blue-100 border border-blue-300 text-blue-700 px-3 py-1.5 rounded shadow-sm text-[10px] sm:text-sm font-bold hover:bg-blue-200 transition">
+                                        <i class="fas fa-eye"></i> বিস্তারিত
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                } else {
+                    contentHtml += `<tr><td colspan="3" class="p-4 text-center text-gray-500 text-sm bg-white border-b">বর্তমানে কোনো লক্ষ্যমাত্রা চালু নেই।</td></tr>`;
+                }
+
+                // === ২. অতীতের লক্ষ্যমাত্রা সেকশন ===
+                contentHtml += `
+                    <tr>
+                        <td colspan="3" class="bg-gray-100 px-4 py-2 mt-4 text-sm font-bold text-gray-700 border-y border-gray-200">
+                            <i class="fas fa-history mr-1 text-gray-500"></i> অতীতের লক্ষ্যমাত্রা (Past Targets)
+                        </td>
+                    </tr>
+                    <tr class="bg-gray-50 text-gray-600 text-[11px] sm:text-sm border-b">
+                        <th class="px-2 py-2 sm:p-3 font-semibold">লক্ষ্যমাত্রার নাম</th>
+                        <th class="px-2 py-2 sm:p-3 font-semibold text-center">পরিমাণ</th>
+                        <th class="px-2 py-2 sm:p-3 font-semibold text-center">অ্যাকশন</th>
+                    </tr>
+                `;
+
+                if (window.allPastTargets.length === 0) {
+                    contentHtml += `<tr><td colspan="3" class="p-6 text-center text-gray-500 text-sm bg-white">অতীতের কোনো লক্ষ্যমাত্রা নেই।</td></tr>`;
+                } else {
+                    window.allPastTargets.forEach(t => {
+                        contentHtml += `
+                            <tr class="hover:bg-gray-50 transition text-xs sm:text-base border-b bg-white">
+                                <td class="px-2 py-3 sm:p-4">
+                                    <div class="font-bold text-gray-800"><i class="fas fa-check-circle text-emerald-500 mr-1"></i> ${t.targetReason}</div>
+                                </td>
+                                <td class="px-2 py-3 sm:p-4 text-center align-middle">
+                                    <div class="font-bold text-sm sm:text-lg text-gray-600">৳${t.targetAmount.toLocaleString('en-IN')}</div>
+                                </td>
+                                <td class="px-2 py-3 sm:p-4 text-center align-middle">
+                                    <div class="flex justify-center gap-2">
+                                        <button onclick="viewTargetDetails('${t.targetSessionId}', '${t.targetReason}', ${t.targetAmount})" class="bg-gray-100 border border-gray-300 text-gray-700 px-3 py-1.5 rounded shadow-sm text-[10px] sm:text-sm font-semibold hover:bg-gray-200 transition"><i class="fas fa-eye"></i> বিস্তারিত</button>
+                                        <button onclick="deletePastTarget('${t.id}')" class="bg-red-50 border border-red-200 text-red-600 px-3 py-1.5 rounded shadow-sm text-[10px] sm:text-sm font-semibold hover:bg-red-100 transition"><i class="fas fa-trash"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                }
+
+                tbody.innerHTML = contentHtml;
+            }
+        }
+
+       // হিস্ট্রি দেখার ফাংশন
+        window.viewUserHistory = function(mobile) {
+            const historyData = window.allDonations.filter(d => d.mobile === mobile && d.status === 'approved');
+            const userName = historyData.length > 0 ? historyData[0].name : "ইউজার";
+
+            let tableRows = '';
+            historyData.forEach(d => {
+                const dateObj = d.timestamp?.toDate ? d.timestamp.toDate() : new Date();
+                const dateStr = dateObj.toLocaleDateString('en-GB');
+                const deleteBtn = `<button onclick="deleteData('${d.id}')" class="text-red-500 hover:text-red-700 ml-2" title="ডিলিট করুন"><i class="fas fa-trash"></i></button>`;
+                const targetBadge = d.isTargetDonation ? `<span class="bg-amber-100 text-amber-700 text-[9px] px-1.5 py-0.5 rounded-full ml-1 align-middle" title="লক্ষ্যমাত্রায় জমা হয়েছে">Target</span>` : '';
+
+                tableRows += `
+                    <tr class="border-b border-gray-200 text-left text-sm hover:bg-gray-50 transition">
+                        <td class="py-3 px-2 text-gray-600 whitespace-nowrap">${dateStr}</td>
+                        <td class="py-3 px-2">
+                            <span class="font-bold text-gray-700">${d.method}</span> ${targetBadge}<br>
+                            <span class="text-[10px] text-gray-400 break-all">${d.trxId}</span>
+                        </td>
+                        <td class="py-3 px-2 text-right font-bold text-emerald-600 whitespace-nowrap">
+                            ৳${d.amount.toLocaleString('en-IN')}
+                            ${deleteBtn}
+                        </td>
+                    </tr>
+                `;
+            });
+
+            const htmlContent = `
+                <div class="max-h-64 overflow-y-auto mt-2">
+                    <table class="w-full border-collapse">
+                        <thead class="bg-gray-100 text-gray-700 text-sm sticky top-0 shadow-sm">
+                            <tr>
+                                <th class="py-2 px-2 text-left rounded-tl-md">তারিখ</th>
+                                <th class="py-2 px-2 text-left">মাধ্যম</th>
+                                <th class="py-2 px-2 text-right rounded-tr-md">পরিমাণ</th>
+                            </tr>
+                        </thead>
+                        <tbody>${tableRows}</tbody>
+                    </table>
+                </div>
+            `;
+
+            Swal.fire({
+                title: `<span class="text-lg font-bold text-gray-800"><i class="fas fa-user-circle text-blue-500 mr-1"></i> ${userName}</span>`,
+                html: htmlContent,
+                showCloseButton: true,
+                showConfirmButton: false,
+                width: '100%',
+                customClass: { popup: 'max-w-md rounded-2xl' }
+            });
+        }
+
+        // Approve Function
+        window.approveData = function(id) {
+            Swal.fire({
+                title: 'অ্যাপ্রুভ করবেন?',
+                text: "অ্যাপ্রুভ করলে এটি পাবলিক লিস্টে যুক্ত হবে!",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#10b981',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'হ্যাঁ',
+                cancelButtonText: 'না'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    await updateDoc(doc(db, "donations", id), { status: "approved" });
+                    Swal.fire('সফল!', 'লিস্টে যুক্ত হয়েছে।', 'success');
+                }
+            });
+        }
+
+        // Reject Function (Instead of direct delete)
+window.deleteData = function(id) {
+    Swal.fire({
+        title: 'রিকোয়েস্টটি বাতিল করবেন?',
+        text: "বাতিল করলে ইউজার তার হিস্ট্রিতে এটি 'বাতিল হয়েছে' হিসেবে দেখতে পাবে এবং ৩ দিন পর এটি চিরতরে ডাটাবেস থেকে মুছে যাবে।",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'হ্যাঁ, বাতিল করুন',
+        cancelButtonText: 'না'
+    }).then(async (result) => {
+        if (result.isConfirmed) {
+            // deleteDoc এর বদলে updateDoc দিয়ে স্ট্যাটাস rejected করে দিচ্ছি এবং একটি সময় যুক্ত করছি
+            await updateDoc(doc(db, "donations", id), { 
+                status: "rejected",
+                rejectedAt: new Date() 
+            });
+            Swal.fire('বাতিল করা হয়েছে!', '', 'success');
+        }
+    });
+} 
+
+        // ফিল্টার ট্যাব লজিক
+        window.setFilter = function(type) {
+            window.currentFilter = type;
+            const btnP = document.getElementById('btnPending');
+            const btnU = document.getElementById('btnUsers');
+            const btnT = document.getElementById('btnTargets');
+            const titleText = document.getElementById('tableMainTitle');
+
+            // সব বাটন রিসেট
+            [btnP, btnU, btnT].forEach(btn => btn.className = "px-3 sm:px-4 py-1.5 rounded-md text-xs sm:text-sm font-semibold text-gray-600 hover:text-gray-800 transition");
+
+            // অ্যাক্টিভ বাটন স্টাইল ও টাইটেল পরিবর্তন
+            if(type === 'pending') {
+                btnP.className = "px-3 sm:px-4 py-1.5 rounded-md text-xs sm:text-sm font-semibold bg-white shadow text-emerald-700 transition";
+                titleText.innerHTML = '<i class="fas fa-list-alt text-emerald-600 mr-2"></i> অনুদানের তালিকা';
+            }
+            if(type === 'users') {
+                btnU.className = "px-3 sm:px-4 py-1.5 rounded-md text-xs sm:text-sm font-semibold bg-white shadow text-emerald-700 transition";
+                titleText.innerHTML = '<i class="fas fa-users text-blue-500 mr-2"></i> দাতাদের তালিকা';
+            }
+            if(type === 'targets') {
+                btnT.className = "px-3 sm:px-4 py-1.5 rounded-md text-xs sm:text-sm font-semibold bg-white shadow text-emerald-700 transition";
+                titleText.innerHTML = '<i class="fas fa-bullseye text-amber-500 mr-2"></i> লক্ষ্যমাত্রা তালিকা';
+            }
+            
+            window.renderTable();
+        }
+
+        // লগইন লজিক (ডাটাবেস + অফলাইন ফলব্যাক)
+        window.checkLogin = async function() {
+            const passInput = document.getElementById('adminPass').value.trim();
+            
+            if(!passInput) {
+                Swal.fire({ icon: 'warning', title: 'ফাঁকা!', text: 'দয়া করে পাসওয়ার্ড দিন।' });
+                return;
+            }
+
+            // লোডিং এনিমেশন দেখানো
+            Swal.fire({
+                title: 'যাচাই করা হচ্ছে...',
+                allowOutsideClick: false,
+                didOpen: () => { Swal.showLoading(); }
+            });
+
+            try {
+                // ডাটাবেস থেকে পাসওয়ার্ড নিয়ে আসার চেষ্টা
+                const docSnap = await getDoc(doc(db, "settings", "general_settings"));
+                
+                let dbPass = '1'; // ডিফল্ট পাসওয়ার্ড
+                if (docSnap.exists() && docSnap.data().adminPassword) {
+                    dbPass = docSnap.data().adminPassword;
+                }
+
+                if(passInput === dbPass) {
+                    Swal.close();
+                    document.getElementById('loginScreen').classList.add('hidden');
+                    document.getElementById('dashboardScreen').classList.remove('hidden');
+                } else {
+                    Swal.fire({ icon: 'error', title: 'ভুল পাসওয়ার্ড!', text: 'সঠিক পাসওয়ার্ড দিন।' });
+                }
+            } catch (error) {
+                console.error("Firebase Auth Error: ", error); // কনসোলে আসল সমস্যা দেখাবে
+                
+                // Fail-safe: ডাটাবেস কানেক্ট না হলেও যদি ইউজার 12345 দেয়, তবে ঢুকতে দেওয়া হবে
+                if(passInput === '12345') {
+                    Swal.close();
+                    document.getElementById('loginScreen').classList.add('hidden');
+                    document.getElementById('dashboardScreen').classList.remove('hidden');
+                    
+                    // ছোট করে একটি ওয়ার্নিং দেখানো যে ডাটাবেস কানেক্ট হয়নি
+                    Swal.fire({
+                        title: 'অফলাইন লগইন', 
+                        text: 'ডাটাবেস কানেক্ট করা যায়নি, তাই ডিফল্ট পাসওয়ার্ড দিয়ে লগইন করা হয়েছে।', 
+                        icon: 'info',
+                        toast: true,
+                        position: 'top-end',
+                        timer: 3000,
+                        showConfirmButton: false
+                    });
+                } else {
+                    // যদি 12345 না দিয়ে অন্য কিছু দেয় এবং ডাটাবেসও কানেক্ট না হয়
+                    Swal.fire({ icon: 'error', title: 'কানেকশন এরর!', text: 'ডাটাবেসের সাথে যুক্ত হতে পারেনি।: ' + error.message });
+                }
+            }
+        }
+
+        window.logout = function() {
+            document.getElementById('adminPass').value = '';
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('dashboardScreen').classList.add('hidden');
+        }
+    
+        // ছবিতে ক্লিক করলে পপ-আপে বড় করে দেখানোর ফাংশন
+        window.viewFullImage = function(imageUrl) {
+            Swal.fire({
+                imageUrl: imageUrl,
+                imageAlt: 'ডোনারের ছবি',
+                showCloseButton: true,
+                showConfirmButton: false,
+                width: 'auto',
+                background: 'transparent',
+                backdrop: 'rgba(0,0,0,0.85)', 
+                customClass: {
+                    image: 'rounded-xl max-h-[70vh] border-4 border-white shadow-2xl object-contain', 
+                    closeButton: 'text-white hover:text-red-500 text-3xl font-bold bg-black bg-opacity-50 rounded-full p-2 mt-2 mr-2'
+                }
+            });
+        }
+
+        // যেকোনো একটি অপশন সেভ করার ফাংশন
+        window.updateSingleSetting = async function(fieldName, inputId, type = 'string') {
+            let val = document.getElementById(inputId).value;
+            
+            if(type === 'number') val = Number(val);
+
+            let updateData = {};
+            updateData[fieldName] = val;
+
+            try {
+                await setDoc(doc(db, "settings", "general_settings"), updateData, { merge: true });
+                
+                Swal.fire({
+                    icon: 'success',
+                    title: 'সেভ হয়েছে!',
+                    text: 'আপনার তথ্য সফলভাবে আপডেট করা হয়েছে।',
+                    timer: 1500,
+                    showConfirmButton: false,
+                    position: 'top-end',
+                    toast: true
+                });
+            } catch (error) {
+                Swal.fire('ত্রুটি!', 'আপডেট করা যায়নি।', 'error');
+            }
+        }
+
+        // প্রোগ্রেস বার অন/অফ করার অটোমেটিক ফাংশন
+        window.toggleTargetProgress = async function(isChecked) {
+            const checkbox = document.getElementById('adminShowTarget');
+
+            if (isChecked) {
+                const { value: formValues } = await Swal.fire({
+                    title: '<span class="text-xl font-bold text-emerald-600">নতুন লক্ষ্যমাত্রা শুরু করুন</span>',
+                    html:
+                        '<input id="swal-name" class="swal2-input" placeholder="লক্ষ্যমাত্রার নাম (যেমন: মাটি ভরাট)" style="width: 85%; font-size: 15px;">' +
+                        '<input id="swal-amount" type="number" class="swal2-input" placeholder="টাকার পরিমাণ (যেমন: 50000)" style="width: 85%; font-size: 15px;">',
+                    focusConfirm: false,
+                    showCancelButton: true,
+                    confirmButtonText: 'চালু করুন',
+                    cancelButtonText: 'বাতিল',
+                    confirmButtonColor: '#10b981',
+                    cancelButtonColor: '#ef4444',
+                    preConfirm: () => {
+                        const name = document.getElementById('swal-name').value;
+                        const amount = document.getElementById('swal-amount').value;
+                        if (!name || !amount) {
+                            Swal.showValidationMessage('দয়া করে নাম এবং টাকার পরিমাণ দুটিই লিখুন!');
+                            return false;
+                        }
+                        return { name: name, amount: Number(amount) };
+                    }
+                });
+
+                if (formValues) {
+                    try {
+                        await setDoc(doc(db, "settings", "general_settings"), {
+                            showTargetProgress: true,
+                            targetSessionId: Date.now().toString(),
+                            targetReason: formValues.name,
+                            target: formValues.amount
+                        }, { merge: true });
+                        Swal.fire({icon: 'success', title: 'চালু হয়েছে!', text: 'নতুন লক্ষ্যমাত্রা সফলভাবে সেট হয়েছে।', timer: 2000, showConfirmButton: false});
+                    } catch (error) {
+                        Swal.fire('ত্রুটি!', 'চালু করা যায়নি।', 'error');
+                        checkbox.checked = false; 
+                    }
+                } else {
+                    checkbox.checked = false;
+                }
+
+            } else {
+                const result = await Swal.fire({
+                    title: 'লক্ষ্যমাত্রা বন্ধ করবেন?',
+                    text: "বর্তমান লক্ষ্যমাত্রা বন্ধ হয়ে অতীতের হিস্ট্রিতে (Targets) সেভ হয়ে যাবে।",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#ef4444',
+                    cancelButtonText: 'না',
+                    confirmButtonText: 'হ্যাঁ, বন্ধ করুন'
+                });
+
+                if (result.isConfirmed) {
+                    try {
+                        const docSnap = await getDoc(doc(db, "settings", "general_settings"));
+                        if (docSnap.exists()) {
+                            const data = docSnap.data();
+                            if (data.targetSessionId) {
+                                await setDoc(doc(db, "past_targets", data.targetSessionId), {
+                                    targetSessionId: data.targetSessionId,
+                                    targetReason: data.targetReason,
+                                    targetAmount: data.target,
+                                    timestamp: new Date()
+                                });
+                            }
+                        }
+
+                        await setDoc(doc(db, "settings", "general_settings"), {
+                            showTargetProgress: false,
+                            targetSessionId: null,
+                            targetReason: "",
+                            target: 0
+                        }, { merge: true });
+                        Swal.fire({icon: 'success', title: 'বন্ধ হয়েছে!', text: 'লক্ষ্যমাত্রা বন্ধ হয়ে হিস্ট্রিতে সেভ হয়েছে।', timer: 2000, showConfirmButton: false});
+                    } catch (error) {
+                        Swal.fire('ত্রুটি!', 'বন্ধ করা যায়নি।', 'error');
+                        checkbox.checked = true; 
+                    }
+                } else {
+                    checkbox.checked = true; 
+                }
+            }
+        }
+
+        window.openSettings = function() {
+            document.getElementById('settingsModal').classList.remove('hidden');
+        }
+
+        window.closeSettings = function() {
+            document.getElementById('settingsModal').classList.add('hidden');
+        }
+
+        // আসল .xlsx এক্সেল ফাইল ডাউনলোড করার ফাংশন
+        window.downloadExcel = function(sessionId, reason) {
+            const targetDonations = window.allDonations.filter(d => d.targetSessionId === sessionId && d.status === 'approved');
+            
+            if (targetDonations.length === 0) {
+                Swal.fire('দুঃখিত', 'ডাউনলোড করার মতো কোনো ডাটা নেই।', 'info');
+                return;
+            }
+
+            // ডাটাগুলোকে সময়ের ভিত্তিতে সাজানো
+            targetDonations.sort((a, b) => b.timestamp - a.timestamp);
+
+            let totalAmount = 0;
+            const uniqueDonors = new Set(); // ইউনিক ডোনার গোনার জন্য
+
+            // এক্সেলের জন্য প্রপার ডাটা ফরম্যাট তৈরি
+            const excelData = targetDonations.map((d, index) => {
+                const dateStr = d.timestamp?.toDate ? d.timestamp.toDate().toLocaleDateString('en-GB') : '';
+                
+                totalAmount += (d.amount || 0); // মোট টাকা হিসাব হচ্ছে
+                if(d.mobile) uniqueDonors.add(d.mobile); // মোট ডোনার হিসাব হচ্ছে
+
+                return {
+                    "ক্রমিক নং": index + 1,
+                    "তারিখ": dateStr,
+                    "নাম": d.name || 'অজ্ঞাত',
+                    "মোবাইল নম্বর": d.mobile || '',
+                    "পেমেন্ট মাধ্যম": d.method || '',
+                    "TrxID বা নম্বর": d.trxId || '',
+                    "পরিমাণ (৳)": d.amount || 0
+                };
+            });
+
+            // এক্সেল শিটে একটি ফাঁকা লাইন (স্পেস) দেওয়া
+            excelData.push({
+                "ক্রমিক নং": "", "তারিখ": "", "নাম": "", "মোবাইল নম্বর": "", "পেমেন্ট মাধ্যম": "", "TrxID বা নম্বর": "", "পরিমাণ (৳)": ""
+            });
+
+            // সবার নিচে মোট ডোনার এবং মোট টাকার হিসাব যোগ করা
+            excelData.push({
+                "ক্রমিক নং": "",
+                "তারিখ": "",
+                "নাম": "",
+                "মোবাইল নম্বর": "",
+                "পেমেন্ট মাধ্যম": `মোট ডোনার: ${uniqueDonors.size} জন`,
+                "TrxID বা নম্বর": "সর্বমোট সংগ্রহ:",
+                "পরিমাণ (৳)": totalAmount
+            });
+
+            // SheetJS এর মাধ্যমে ওয়ার্কশিট এবং ওয়ার্কবুক তৈরি
+            const worksheet = XLSX.utils.json_to_sheet(excelData);
+            
+            // কলামের সাইজ ঠিক করা
+            worksheet['!cols'] = [
+                { wch: 10 },  // ক্রমিক
+                { wch: 15 },  // তারিখ
+                { wch: 25 },  // নাম
+                { wch: 15 },  // মোবাইল
+                { wch: 20 },  // মাধ্যম (সাইজ একটু বাড়ানো হলো)
+                { wch: 20 },  // TrxID
+                { wch: 15 }   // পরিমাণ
+            ];
+
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Donations List");
+
+            // ফাইল ডাউনলোড করা
+            XLSX.writeFile(workbook, `${reason}_Donations.xlsx`);
+        };
+
+        // লক্ষ্যমাত্রার বিস্তারিত দেখার ফাংশন
+        window.viewTargetDetails = function(sessionId, reason, targetAmount) {
+            const targetDonations = window.allDonations.filter(d => d.targetSessionId === sessionId && d.status === 'approved');
+            
+            let totalRaised = 0;
+            targetDonations.forEach(d => totalRaised += d.amount);
+
+            // নতুন পেমেন্টগুলো উপরে দেখানোর জন্য সর্টিং
+            targetDonations.sort((a, b) => b.timestamp - a.timestamp);
+
+            let listHtml = '';
+            if (targetDonations.length === 0) {
+                listHtml = `<div class="p-4 text-center text-gray-500">কেউ অনুদান দেননি।</div>`;
+            } else {
+                targetDonations.forEach(d => {
+                    const avatar = d.photo ? `<img src="${d.photo}" class="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover shrink-0">` : `<div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 shrink-0"><i class="fas fa-user text-xs sm:text-base"></i></div>`;
+                    
+                    // মাধ্যম অনুযায়ী ব্যাজ কালার
+                    let methodColor = "bg-gray-100 text-gray-700";
+                    if(d.method === 'বিকাশ') methodColor = "bg-pink-100 text-pink-700";
+                    if(d.method === 'নগদ') methodColor = "bg-orange-100 text-orange-700";
+                    if(d.method === 'রকেট') methodColor = "bg-purple-100 text-purple-700";
+                    if(d.method === 'ক্যাশ') methodColor = "bg-green-100 text-green-700";
+
+                    listHtml += `
+                        <div class="flex items-center p-2 border-b border-gray-100 hover:bg-gray-50 text-left transition">
+                            ${avatar}
+                            <div class="ml-2 w-1/3">
+                                <div class="text-[12px] sm:text-sm font-bold text-gray-800 leading-tight truncate" title="${d.name}">${d.name}</div>
+                                <div class="text-[9px] sm:text-xs text-gray-500">${d.mobile}</div>
+                            </div>
+                            <div class="flex-1 px-1 text-center">
+                                <span class="inline-block text-[9px] sm:text-[10px] font-bold px-1.5 py-0.5 rounded ${methodColor}">${d.method}</span>
+                                <div class="text-[9px] sm:text-[10px] text-gray-400 mt-0.5 font-mono break-all line-clamp-1" title="${d.trxId}">${d.trxId || ''}</div>
+                            </div>
+                            <div class="text-[13px] sm:text-base font-bold text-emerald-600 text-right shrink-0">
+                                ৳${d.amount.toLocaleString('en-IN')}
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            const htmlContent = `
+                <div class="bg-blue-50 p-3 rounded-lg mb-4 mt-2 border border-blue-100 text-center relative">
+                    <div class="text-xs text-gray-500">লক্ষ্যমাত্রা (টার্গেট)</div>
+                    <div class="text-lg font-bold text-blue-700">৳${targetAmount.toLocaleString('en-IN')}</div>
+                    
+                    <div class="text-xs text-gray-500 mt-2">সর্বমোট সংগ্রহ হয়েছে</div>
+                    <div class="text-xl font-bold text-emerald-600">৳${totalRaised.toLocaleString('en-IN')}</div>
+                </div>
+
+                <div class="flex justify-between items-center border-b border-gray-200 pb-2 mb-2">
+                    <div class="text-left font-bold text-gray-700 text-sm"><i class="fas fa-users text-amber-500"></i> দাতাদের তালিকা:</div>
+                    <button onclick="downloadExcel('${sessionId}', '${reason}')" class="text-emerald-700 bg-emerald-100 hover:bg-emerald-200 border border-emerald-200 px-3 py-1.5 rounded-md text-[11px] font-bold transition flex items-center gap-1 shadow-sm">
+                        <i class="fas fa-file-excel text-emerald-600"></i> Excel ডাউনলোড
+                    </button>
+                </div>
+
+                <div class="max-h-60 overflow-y-auto pr-1">
+                    ${listHtml}
+                </div>
+            `;
+
+            Swal.fire({
+                title: `<span class="text-lg font-bold text-gray-800">${reason}</span>`,
+                html: htmlContent,
+                showCloseButton: true,
+                showConfirmButton: false,
+                customClass: { popup: 'rounded-2xl w-[95%] sm:max-w-md' }
+            });
+        }
+
+        // হিস্ট্রি থেকে লক্ষ্যমাত্রা ডিলিট করা
+        window.deletePastTarget = function(id) {
+            Swal.fire({
+                title: 'ডিলিট করতে চান?',
+                text: "এই লক্ষ্যমাত্রার রেকর্ড মুছে যাবে, তবে মূল ফান্ড বা ডোনারদের টাকা ঠিকই থাকবে।",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonText: 'বাতিল',
+                confirmButtonText: 'হ্যাঁ, মুছুন'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    await deleteDoc(doc(db, "past_targets", id));
+                    Swal.fire('মুছে ফেলা হয়েছে!', '', 'success');
+                }
+            });
+        }
+
+    </script>
+</body>
+</html>
