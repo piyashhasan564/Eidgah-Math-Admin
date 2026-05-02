@@ -30,7 +30,7 @@
     <div id="loginScreen" class="min-h-screen flex items-center justify-center bg-emerald-700 px-4">
         <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md text-center">
             <i class="fas fa-user-shield text-5xl text-emerald-600 mb-4"></i>
-            <h2 class="text-2xl font-bold text-gray-800 mb-6">অ্যাডমিন প্যানেল</h2>
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">অ্যাডমিন প্যানেল</h2> 
             <div class="mb-4">
                 <input type="password" id="adminPass" placeholder="পাসওয়ার্ড দিন" class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-emerald-500 text-lg text-center" onkeypress="handleEnter(event)">
             </div>
@@ -51,8 +51,15 @@
                 </div>
                 <!-- বাটন গ্রুপ -->
                 <div class="flex items-center gap-3">
-                    <button onclick="openSettings()" class="bg-blue-600 hover:bg-blue-700 px-3 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition shadow-md" title="সেটিংস">
+                
+                    <button onclick="openSettings()" class="bg-blue-500 hover:bg-blue-600 px-2 py-1 rounded-lg text-sm font-semibold flex items-center gap-2 transition shadow-md" title="সেটিংস">
                         <i class="fas fa-cog text-lg"></i>
+                    </button>
+                    <button onclick="openManualModal()" class="bg-amber-500 hover:bg-amber-600 px-3 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition shadow-md text-white" title="ম্যানুয়াল জমা">
+    <i class="fas fa-plus-circle"></i> <span class="hidden sm:inline">অফলাইন জমা</span>
+</button>
+<button onclick="openExpenseModal()" class="bg-red-500 hover:bg-red-600 px-3 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition shadow-md text-white" title="খরচ যুক্ত করুন">
+                        <i class="fas fa-minus-circle"></i> <span class="hidden sm:inline">খরচ এন্ট্রি</span>
                     </button>
                     <button onclick="logout()" class="bg-red-500 hover:bg-red-600 px-3 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition shadow-md">
                         <i class="fas fa-sign-out-alt"></i> <span class="hidden sm:inline">লগআউট</span>
@@ -64,53 +71,157 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             
             <!-- স্ট্যাটাস কার্ডস -->
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
+            <div class="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8">
                 <!-- মোট সংগ্রহ -->
                 <div class="bg-white rounded-xl shadow-sm p-4 sm:p-6 border-l-4 border-emerald-500 flex flex-col sm:flex-row items-start sm:items-center justify-between">
                     <div>
                         <p class="text-gray-500 text-xs sm:text-sm font-medium">মোট সংগ্রহ</p>
                         <h3 class="text-xl sm:text-3xl font-bold text-gray-800 mt-1" id="totalRaised">৳০</h3>
                     </div>
-                    <div class="hidden sm:flex w-10 h-10 sm:w-12 sm:h-12 bg-emerald-100 rounded-full items-center justify-center text-emerald-600 text-lg sm:text-2xl mt-2 sm:mt-0">
-                        <i class="fas fa-money-bill-wave"></i>
+                    <div class="hidden sm:flex w-10 h-10 sm:w-12 sm:h-12 bg-emerald-100 rounded-full items-center justify-center text-emerald-600 text-lg sm:text-2xl mt-2 sm:mt-0"><i class="fas fa-hand-holding-usd"></i></div>
+                </div>
+
+                <!-- মোট খরচ -->
+                <div class="bg-white rounded-xl shadow-sm p-4 sm:p-6 border-l-4 border-red-500 flex flex-col sm:flex-row items-start sm:items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-xs sm:text-sm font-medium">মোট খরচ</p>
+                        <h3 class="text-xl sm:text-3xl font-bold text-red-600 mt-1" id="totalExpenseShow">৳০</h3>
                     </div>
+                    <div class="hidden sm:flex w-10 h-10 sm:w-12 sm:h-12 bg-red-100 rounded-full items-center justify-center text-red-600 text-lg sm:text-2xl mt-2 sm:mt-0"><i class="fas fa-file-invoice-dollar"></i></div>
+                </div>
+
+                <!-- বর্তমান ফান্ড (ব্যালেন্স) -->
+                <div class="bg-white rounded-xl shadow-sm p-4 sm:p-6 border-l-4 border-blue-600 flex flex-col sm:flex-row items-start sm:items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-xs sm:text-sm font-medium">বর্তমান ফান্ড (ক্যাশে আছে)</p>
+                        <h3 class="text-xl sm:text-3xl font-bold text-blue-700 mt-1" id="currentBalanceShow">৳০</h3>
+                    </div>
+                    <div class="hidden sm:flex w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-full items-center justify-center text-blue-600 text-lg sm:text-2xl mt-2 sm:mt-0"><i class="fas fa-wallet"></i></div>
                 </div>
 
                 <!-- পেন্ডিং রিকোয়েস্ট -->
                 <div class="bg-white rounded-xl shadow-sm p-4 sm:p-6 border-l-4 border-amber-500 flex flex-col sm:flex-row items-start sm:items-center justify-between">
                     <div>
-                        <p class="text-gray-500 text-xs sm:text-sm font-medium">অপেক্ষমাণ</p>
+                        <p class="text-gray-500 text-xs sm:text-sm font-medium">অপেক্ষমাণ অনুদান</p>
                         <h3 class="text-xl sm:text-3xl font-bold text-gray-800 mt-1" id="pendingCount">০</h3>
                     </div>
-                    <div class="hidden sm:flex w-10 h-10 sm:w-12 sm:h-12 bg-amber-100 rounded-full items-center justify-center text-amber-600 text-lg sm:text-2xl mt-2 sm:mt-0">
-                        <i class="fas fa-hourglass-half"></i>
-                    </div>
+                    <div class="hidden sm:flex w-10 h-10 sm:w-12 sm:h-12 bg-amber-100 rounded-full items-center justify-center text-amber-600 text-lg sm:text-2xl mt-2 sm:mt-0"><i class="fas fa-hourglass-half"></i></div>
                 </div>
 
-                <!-- মোট ডোনার (যারা টাকা দিয়েছে) -->
-                <div class="bg-white rounded-xl shadow-sm p-4 sm:p-6 border-l-4 border-blue-500 flex flex-col sm:flex-row items-start sm:items-center justify-between">
+                <!-- মোট দাতা -->
+                <div class="bg-white rounded-xl shadow-sm p-4 sm:p-6 border-l-4 border-blue-400 flex flex-col sm:flex-row items-start sm:items-center justify-between">
                     <div>
                         <p class="text-gray-500 text-xs sm:text-sm font-medium">মোট দাতা</p>
                         <h3 class="text-xl sm:text-3xl font-bold text-gray-800 mt-1" id="approvedCount">০</h3>
                     </div>
-                    <div class="hidden sm:flex w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-full items-center justify-center text-blue-600 text-lg sm:text-2xl mt-2 sm:mt-0">
-                        <i class="fas fa-hand-holding-heart"></i>
-                    </div>
+                    <div class="hidden sm:flex w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-full items-center justify-center text-blue-500 text-lg sm:text-2xl mt-2 sm:mt-0"><i class="fas fa-users"></i></div>
                 </div>
 
-                <!-- মোট ইউজার (নতুন বক্স - যারা রেজিস্টার করেছে) -->
+                <!-- মোট ইউজার -->
                 <div class="bg-white rounded-xl shadow-sm p-4 sm:p-6 border-l-4 border-purple-500 flex flex-col sm:flex-row items-start sm:items-center justify-between">
                     <div>
-                        <p class="text-gray-500 text-xs sm:text-sm font-medium">রেজিস্টার্ড ইউজার</p>
+                        <p class="text-gray-500 text-xs sm:text-sm font-medium">রেজিস্টার্ড অ্যাকাউন্ট</p>
                         <h3 class="text-xl sm:text-3xl font-bold text-gray-800 mt-1" id="totalUsersCount">০</h3>
                     </div>
-                    <div class="hidden sm:flex w-10 h-10 sm:w-12 sm:h-12 bg-purple-100 rounded-full items-center justify-center text-purple-600 text-lg sm:text-2xl mt-2 sm:mt-0">
-                        <i class="fas fa-users"></i>
-                    </div>
+                    <div class="hidden sm:flex w-10 h-10 sm:w-12 sm:h-12 bg-purple-100 rounded-full items-center justify-center text-purple-600 text-lg sm:text-2xl mt-2 sm:mt-0"><i class="fas fa-user-plus"></i></div>
                 </div>
-            
+            </div>
+<!-- ================= ম্যানুয়াল ডোনেশন মোডাল ================= -->
+<div id="manualDonationModal" class="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center hidden backdrop-blur-sm px-4">
+    <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md relative transform transition-all">
+        <!-- ক্লোজ বাটন -->
+        <button onclick="closeManualModal()" class="absolute top-4 right-4 text-gray-400 hover:text-red-500 transition text-2xl">
+            <i class="fas fa-times-circle"></i>
+        </button>
+        
+        <h3 class="text-xl font-bold text-gray-800 mb-4 border-b pb-3"><i class="fas fa-hand-holding-usd text-emerald-500 mr-2"></i> ম্যানুয়াল অনুদান (ক্যাশ)</h3>
+        
+        <!-- Step 1: নাম্বার চেক করার ফর্ম -->
+        <div id="manualStep1">
+            <label class="block text-sm font-bold text-gray-700 mb-2">ডোনারের মোবাইল নম্বর দিন</label>
+            <div class="flex gap-2">
+                <input type="tel" id="manualSearchMobile" class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-emerald-500 font-bold text-lg tracking-wider" placeholder="01XXXXXXXXX" onkeypress="if(event.key === 'Enter') checkManualMobile()">
+                <button onclick="checkManualMobile()" id="btnCheckMobile" class="bg-gray-800 hover:bg-gray-900 text-white px-5 rounded-lg font-bold transition shrink-0">
+                    <i class="fas fa-search"></i> খুঁজুন
+                </button>
+            </div>
+        </div>
+
+        <!-- Step 2: টাকা বসানোর ফর্ম (একাউন্ট থাকলে দেখাবে) -->
+        <div id="manualStep2" class="hidden mt-4">
+            <!-- ইউজারের প্রোফাইল কার্ড -->
+            <div class="bg-gray-50 border border-gray-200 p-3 rounded-lg flex items-center gap-4 mb-4">
+                <img id="manualUserPic" src="" class="w-12 h-12 rounded-full object-cover border-2 border-emerald-500">
+                <div>
+                    <div id="manualUserName" class="font-bold text-gray-800 text-lg leading-tight">নাম</div>
+                    <div id="manualUserPhone" class="text-xs font-bold text-gray-500">মোবাইল নম্বর</div>
+                </div>
             </div>
 
+            <!-- টাকার ইনপুট -->
+            <label class="block text-sm font-bold text-gray-700 mb-2">টাকার পরিমাণ (৳)</label>
+            <input type="number" id="manualAmount" class="w-full px-4 py-3 border-2 border-emerald-200 bg-emerald-50 rounded-lg focus:outline-none focus:border-emerald-500 font-bold text-xl text-emerald-700 mb-3" placeholder="যেমন: 500">
+            
+            <div class="text-sm font-bold text-gray-500 mb-4 flex justify-between bg-gray-100 p-2 rounded">
+                <span>মাধ্যম:</span> <span class="text-green-600"><i class="fas fa-money-bill-wave"></i> সরাসরি ক্যাশ</span>
+            </div>
+
+            <!-- টার্গেট ইনফো (ডাইনামিক) -->
+            <div id="manualTargetInfo" class="text-center text-sm font-bold p-2 rounded mb-4"></div>
+
+            <button onclick="submitManualDonation()" id="btnSubmitManual" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-lg transition duration-300 shadow-lg flex items-center justify-center gap-2">
+                <i class="fas fa-check-circle"></i> জমা দিন
+            </button>
+        </div>
+
+        <!-- Step 3: নতুন একাউন্ট খোলার ফর্ম -->
+        <div id="manualStep3" class="hidden mt-4 border-t pt-4">
+            <div class="bg-amber-50 text-amber-700 p-3 rounded-lg text-sm font-bold mb-4 border border-amber-200">
+                <i class="fas fa-info-circle"></i> এই নাম্বারে একাউন্ট নেই। নতুন একাউন্ট তৈরি করুন।
+            </div>
+            
+            <input type="hidden" id="regManualMobile">
+            
+            <div class="mb-3">
+                <label class="block text-xs font-bold text-gray-600 mb-1">দাতার পূর্ণ নাম <span class="text-red-500">*</span></label>
+                <input type="text" id="regManualName" class="w-full px-3 py-2 border border-gray-300 rounded focus:border-emerald-500 outline-none" placeholder="নাম লিখুন">
+            </div>
+            
+            <!-- ছবি অপশনাল করা হয়েছে -->
+            <div class="mb-4">
+                <label class="block text-xs font-bold text-gray-600 mb-1">দাতার ছবি দিন <span class="text-emerald-600">(ঐচ্ছিক)</span></label>
+                <input type="file" id="regManualImage" accept="image/*" class="w-full text-sm border border-gray-300 rounded p-1">
+            </div>
+
+            <button onclick="createManualUser()" id="btnCreateManualUser" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded shadow transition">
+                <i class="fas fa-user-plus"></i> একাউন্ট খুলুন ও জমা দিন
+            </button>
+        </div>
+
+    </div>
+</div>
+<!-- ================= খরচের মোডাল ================= -->
+<div id="expenseModal" class="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center hidden backdrop-blur-sm px-4">
+    <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md relative">
+        <button onclick="closeExpenseModal()" class="absolute top-4 right-4 text-gray-400 hover:text-red-500 transition text-2xl">
+            <i class="fas fa-times-circle"></i>
+        </button>
+        <h3 class="text-xl font-bold text-red-600 mb-4 border-b pb-3"><i class="fas fa-file-invoice-dollar mr-2"></i> নতুন খরচ যুক্ত করুন</h3>
+        
+        <div class="mb-3">
+            <label class="block text-sm font-bold text-gray-700 mb-1">কী বাবদ খরচ? (বিবরণ)</label>
+            <input type="text" id="expenseReason" class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:border-red-500 outline-none font-semibold text-sm" placeholder="যেমন: ইট কেনা, মিস্ত্রি বিল ইত্যাদি">
+        </div>
+        <div class="mb-4">
+            <label class="block text-sm font-bold text-gray-700 mb-1">টাকার পরিমাণ (৳)</label>
+            <input type="number" id="expenseAmount" class="w-full px-4 py-3 border-2 border-red-200 bg-red-50 rounded-lg focus:border-red-500 outline-none font-bold text-xl text-red-700" placeholder="5000">
+        </div>
+
+        <button onclick="submitExpense()" id="btnSubmitExpense" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg transition duration-300 shadow-lg">
+            <i class="fas fa-check-circle"></i> খরচ সেভ করুন
+        </button>
+    </div>
+</div>
             <!-- ================= সেটিংস মোডাল (পপ-আপ) ================= -->
             <div id="settingsModal" class="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center hidden backdrop-blur-sm px-4">
                 <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-lg relative transform transition-all max-h-[90vh] overflow-y-auto">
@@ -206,6 +317,7 @@
                         <button onclick="setFilter('pending')" id="btnPending" class="px-3 sm:px-4 py-1.5 rounded-md text-xs sm:text-sm font-semibold bg-white shadow text-emerald-700 transition">Pending</button>
                         <button onclick="setFilter('users')" id="btnUsers" class="px-3 sm:px-4 py-1.5 rounded-md text-xs sm:text-sm font-semibold text-gray-600 hover:text-gray-800 transition">Users</button>
                         <button onclick="setFilter('targets')" id="btnTargets" class="px-3 sm:px-4 py-1.5 rounded-md text-xs sm:text-sm font-semibold text-gray-600 hover:text-gray-800 transition">Targets</button>
+                        <button onclick="setFilter('expenses')" id="btnExpenses" class="px-3 sm:px-4 py-1.5 rounded-md text-xs sm:text-sm font-semibold text-gray-600 hover:text-gray-800 transition">Expenses</button>
                     </div>
                 </div>
 
@@ -226,7 +338,7 @@
     <!-- Firebase & Logic Scripts -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getFirestore, collection, onSnapshot, query, orderBy, doc, updateDoc, deleteDoc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot, query, orderBy, doc, updateDoc, deleteDoc, setDoc, getDocs, where, getDoc, increment, limit, getCountFromServer } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         // ==========================================
         // আপনার ফায়ারবেস Config
@@ -252,48 +364,40 @@ const firebaseConfig = {
         window.currentFilter = 'pending';
         window.allUsersData = [];
 
-        // ডাটাবেস থেকে রিয়ে-টাইম ডাটা ফেচিং
-        const q = query(collection(db, "donations"), orderBy("timestamp", "desc"));
+        // ডাটাবেস থেকে শুধু Pending ডাটা ফেচিং (ইনডেক্স এরর ছাড়া)
+        const q = query(collection(db, "donations"), where("status", "==", "pending")); 
         onSnapshot(q, (snapshot) => {
-    window.allDonations = [];
-    let totalTaka = 0;
-    let pendingReq = 0;
-    
-    // ৩ দিনের হিসাব করার জন্য
-    const now = new Date().getTime();
-    const sevenDaysInMs = 3 * 24 * 60 * 60 * 1000;
+            window.allDonations = [];
+            let pendingReq = 0;
+            
+            snapshot.forEach((docSnapshot) => {
+                const data = docSnapshot.data();
+                data.id = docSnapshot.id; 
+                window.allDonations.push(data);
+                pendingReq++;
+            });
 
-    snapshot.forEach((docSnapshot) => {
-        const data = docSnapshot.data();
-        data.id = docSnapshot.id; 
+            // JavaScript দিয়ে সময় অনুযায়ী সাজানো (যাতে ফায়ারবেস ইনডেক্স এরর না দেয়)
+            window.allDonations.sort((a, b) => {
+                const timeA = a.timestamp ? a.timestamp.toMillis() : 0;
+                const timeB = b.timestamp ? b.timestamp.toMillis() : 0;
+                return timeB - timeA;
+            });
 
-        // === ৩ দিন পর অটো ডিলিট লজিক ===
-        if (data.status === "rejected" && data.rejectedAt) {
-            const rejectTime = data.rejectedAt.toDate().getTime();
-            if (now - rejectTime > sevenDaysInMs) {
-                deleteDoc(doc(db, "donations", data.id)); // ৩ দিন পার হলে সাইলেন্টলি ডাটাবেস থেকে ডিলিট হয়ে যাবে
-                return; // লিস্টে আর যুক্ত হবে না
-            }
-        }
-
-        window.allDonations.push(data);
-
-        // স্ট্যাটাস অনুযায়ী কাউন্ট
-        if (data.status === "approved") {
-            totalTaka += data.amount;
-        } else if (data.status === "pending") { // rejected গুলো যেন pending এ কাউন্ট না হয়
-            pendingReq++;
-        }
-    });
-
-            document.getElementById('totalRaised').innerText = '৳' + totalTaka.toLocaleString('en-IN');
             document.getElementById('pendingCount').innerText = pendingReq;
             
-            // ইউনিক ডোনার কাউন্ট
-            const uniqueApprovedDonors = new Set(window.allDonations.filter(d => d.status === 'approved').map(d => d.mobile));
-            document.getElementById('approvedCount').innerText = uniqueApprovedDonors.size;
+            // মোট দাতার সংখ্যা (যাদের মোট টাকা ০ এর চেয়ে বেশি)
+            async function loadApprovedCount() {
+                try {
+                    const qDonors = query(collection(db, "users"), where("totalAmount", ">", 0));
+                    const snapCount = await getCountFromServer(qDonors);
+                    document.getElementById('approvedCount').innerText = snapCount.data().count;
+                } catch(e) { console.log("Donor Count Error:", e); }
+            }
+            loadApprovedCount();
 
-            window.renderTable();
+            // যদি অ্যাডমিন pending ট্যাবে থাকে তবেই টেবিল লোড হবে
+            if(window.currentFilter === 'pending') window.renderTable();
         });
 
         // অতীতের লক্ষ্যমাত্রা ফেচিং
@@ -307,42 +411,51 @@ const firebaseConfig = {
             });
             if(window.currentFilter === 'targets') window.renderTable();
         });
-// ফায়ারবেস থেকে সব রেজিস্টার্ড ইউজার ফেচিং
-        onSnapshot(collection(db, "users"), (snapshot) => {
-            window.allUsersData = [];
-            snapshot.forEach((docSnap) => {
-                window.allUsersData.push(docSnap.data());
-            });
-            // মোট ইউজারের সংখ্যা বক্সে দেখানো
-            document.getElementById('totalUsersCount').innerText = window.allUsersData.length;
-            
-            if(window.currentFilter === 'users') window.renderTable();
-        });
-        // রিয়েলটাইম সেটিংস ডাটা লোড
-        onSnapshot(doc(db, "settings", "general_settings"), (docSnap) => {
-            if (docSnap.exists()) {
-                const data = docSnap.data();
-                
-                document.getElementById('adminBkash').value = data.bkash || "";
-                document.getElementById('adminNagad').value = data.nagad || "";
-                document.getElementById('adminRocket').value = data.rocket || "";
-                document.getElementById('adminMessage').value = data.message || "";
-                
-                document.getElementById('adminShowTarget').checked = data.showTargetProgress !== false; 
-                
-                if (data.showTargetProgress && data.targetSessionId) {
-                    window.activeTargetInfo = {
-                        reason: data.targetReason,
-                        amount: data.target,
-                        sessionId: data.targetSessionId
-                    };
-                } else {
-                    window.activeTargetInfo = null;
-                }
-                
-                if(window.currentFilter === 'targets') window.renderTable();
+// ফায়ারবেস থেকে শুধু ইউজারের সংখ্যা (Count) আনা (খরচ মাত্র ১ রিড)
+        async function loadTotalUsersCount() {
+            try {
+                const coll = collection(db, "users");
+                const snapshot = await getCountFromServer(coll);
+                document.getElementById('totalUsersCount').innerText = snapshot.data().count;
+            } catch (error) {
+                console.log("Count Error:", error);
             }
-        });
+        }
+        loadTotalUsersCount();
+        // রিয়েলটাইম সেটিংস ডাটা লোড
+onSnapshot(doc(db, "settings", "general_settings"), (docSnap) => {
+    if (docSnap.exists()) {
+        const data = docSnap.data();
+        
+        // ----> নতুন যুক্ত করা লাইন (মোট ফান্ডের ও খরচের হিসাব) <----
+        let totalF = data.totalFund || 0;
+        let totalE = data.totalExpense || 0;
+        let currentBal = totalF - totalE;
+
+        document.getElementById('totalRaised').innerText = '৳' + totalF.toLocaleString('en-IN');
+        document.getElementById('totalExpenseShow').innerText = '৳' + totalE.toLocaleString('en-IN');
+        document.getElementById('currentBalanceShow').innerText = '৳' + currentBal.toLocaleString('en-IN');
+        
+        document.getElementById('adminBkash').value = data.bkash || "";
+        document.getElementById('adminNagad').value = data.nagad || "";
+        document.getElementById('adminRocket').value = data.rocket || "";
+        document.getElementById('adminMessage').value = data.message || "";
+        
+        document.getElementById('adminShowTarget').checked = data.showTargetProgress !== false; 
+        
+        if (data.showTargetProgress && data.targetSessionId) {
+            window.activeTargetInfo = {
+                reason: data.targetReason,
+                amount: data.target,
+                sessionId: data.targetSessionId
+            };
+        } else {
+            window.activeTargetInfo = null;
+        }
+        
+        if(window.currentFilter === 'targets') window.renderTable();
+    }
+});
 
         // টেবিল রেন্ডার ফাংশন
         window.renderTable = function() {
@@ -399,9 +512,11 @@ const firebaseConfig = {
                             </div>
                         </td>
                         <td class="px-2 py-3 sm:p-4 border-b text-center align-middle">
-                            <span class="inline-block px-1.5 py-0.5 sm:px-2 sm:py-1 rounded text-[10px] sm:text-xs font-bold ${methodColor} mb-1">${data.method}</span>
-                            <div class="text-[9px] sm:text-xs text-gray-500 font-mono break-all line-clamp-2">${data.trxId}</div>
-                        </td>
+    <span class="inline-block px-1.5 py-0.5 sm:px-2 sm:py-1 rounded text-[10px] sm:text-xs font-bold ${methodColor} mb-1">${data.method}</span>
+    <div class="text-[10px] sm:text-xs text-gray-700 font-mono break-all line-clamp-2 bg-gray-100 px-2 py-1 rounded inline-block border border-gray-200">
+        <span class="text-gray-400 font-sans text-[9px] font-bold">TrxID:</span> ${data.trxId}
+    </div>
+</td>
                         <td class="px-2 py-3 sm:p-4 border-b text-right font-bold text-sm sm:text-lg text-emerald-700 align-middle">
                             ৳${data.amount.toLocaleString('en-IN')}
                         </td>
@@ -416,98 +531,77 @@ const firebaseConfig = {
                 });
             } 
             // ---- USERS TAB ----
-            else if (window.currentFilter === 'users') {
-                thead.innerHTML = `
-                    <tr class="bg-gray-50 text-gray-600 text-[11px] sm:text-sm border-b">
-                        <th class="px-2 py-3 sm:p-4 font-semibold">ইউজারের তথ্য</th>
-                        <th class="px-2 py-3 sm:p-4 font-semibold text-center">মোট অনুদান</th>
-                        <th class="px-2 py-3 sm:p-4 font-semibold text-center">অ্যাকশন</th>
-                    </tr>
-                `;
+else if (window.currentFilter === 'users') {
+    // সার্চ বক্স এবং টেবিলের হেড
+    thead.innerHTML = `
+        <tr class="bg-white border-b">
+            <td colspan="3" class="p-3">
+                <div class="flex gap-2 max-w-md mx-auto sm:mx-0">
+                    <input type="text" id="searchUserInput" value="${window.lastSearchTerm || ''}" placeholder="নাম অথবা মোবাইল নম্বর দিন..." class="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 text-sm font-bold" onkeypress="if(event.key === 'Enter') searchUserAdmin()">
+                    <button onclick="searchUserAdmin()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-bold transition flex items-center gap-1 shrink-0">
+                        <i class="fas fa-search"></i> খুঁজুন
+                    </button>
+                    <button onclick="clearUserSearch()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-2 rounded-lg text-sm font-bold transition shrink-0" title="রিসেট করুন">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </td>
+        </tr>
+        <tr class="bg-gray-50 text-gray-600 text-[11px] sm:text-sm border-b">
+            <th class="px-2 py-3 sm:p-4 font-semibold">ইউজারের তথ্য</th>
+            <th class="px-2 py-3 sm:p-4 font-semibold text-center">মোট অনুদান</th>
+            <th class="px-2 py-3 sm:p-4 font-semibold text-center">অ্যাকশন</th>
+        </tr>
+    `;
 
-                // প্রথমে অনুদানগুলোর হিসাব বের করা
-                const userDonationMap = {};
-                window.allDonations.forEach(d => {
-                    if (d.status !== 'approved') return;
-                    if (!userDonationMap[d.mobile]) {
-                        userDonationMap[d.mobile] = { amount: 0, count: 0 };
-                    }
-                    userDonationMap[d.mobile].amount += d.amount;
-                    userDonationMap[d.mobile].count += 1;
-                });
+    if (window.allUsersData.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="3" class="p-8 text-center text-gray-500 font-medium">কোনো ইউজার পাওয়া যায়নি।</td></tr>`;
+        return;
+    }
 
-                // ডাটাবেসের সব রেজিস্টার্ড ইউজারদের সাথে অনুদানের হিসাব মেলানো
-                let usersArray = window.allUsersData.map(u => {
-                    let donInfo = userDonationMap[u.mobile] || { amount: 0, count: 0 };
-                    return {
-                        name: u.name,
-                        mobile: u.mobile,
-                        photo: u.photo,
-                        totalAmount: donInfo.amount,
-                        donationsCount: donInfo.count
-                    };
-                });
+    window.allUsersData.forEach(u => {
+        const totalAmt = u.totalAmount || 0;
+        let totalCnt = u.totalCount || 0;
 
-                // কেউ যদি রেজিস্টার না করে সরাসরি অনুদান দিয়ে থাকে (অ্যাডমিনের মাধ্যমে), তাদেরও লিস্টে যোগ করা
-                const registeredMobiles = new Set(window.allUsersData.map(u => u.mobile));
-                for (let mobile in userDonationMap) {
-                    if (!registeredMobiles.has(mobile)) {
-                        let donRecord = window.allDonations.find(d => d.mobile === mobile);
-                        usersArray.push({
-                            name: donRecord ? donRecord.name : 'অজ্ঞাত',
-                            mobile: mobile,
-                            photo: donRecord ? donRecord.photo : '',
-                            totalAmount: userDonationMap[mobile].amount,
-                            donationsCount: userDonationMap[mobile].count
-                        });
-                    }
-                }
+        // যাদের আগে টাকা দেওয়া আছে কিন্তু হিসাব '০' হয়ে আছে, তাদের ডিফল্টভাবে '১' করে দেওয়া
+        if(totalAmt > 0 && totalCnt === 0) {
+            totalCnt = 1;
+        }
 
-                // সাজানো: যারা টাকা দিয়েছে তারা উপরে থাকবে, যারা দেয় নাই তারা নিচে থাকবে
-                usersArray.sort((a, b) => b.totalAmount - a.totalAmount);
+        const adminAvatar = u.photo && u.photo !== "" 
+            ? `<img src="${u.photo}" class="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover border border-gray-200 shadow-sm mr-2 sm:mr-3 shrink-0">` 
+            : `<div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 mr-2 sm:mr-3 shrink-0"><i class="fas fa-user"></i></div>`;
 
-                if (usersArray.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="3" class="p-8 text-center text-gray-500 font-medium">কোনো ইউজার নেই।</td></tr>`;
-                    return;
-                }
+        const amountColor = totalAmt > 0 ? "text-emerald-700" : "text-gray-400";
+        const isZero = totalAmt === 0;
 
-                usersArray.forEach(u => {
-                    const adminAvatar = u.photo && u.photo !== "" 
-                        ? `<img src="${u.photo}" onclick="viewFullImage('${u.photo}')" class="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover border border-gray-200 shadow-sm mr-2 sm:mr-3 cursor-pointer hover:opacity-80 transition hover:ring-2 hover:ring-emerald-400 shrink-0">` 
-                        : `<div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 mr-2 sm:mr-3 shrink-0"><i class="fas fa-user text-xs sm:text-base"></i></div>`;
-
-                    // যদি কেউ টাকা না দিয়ে থাকে, তাহলে স্টাইল একটু ভিন্ন হবে
-                    const amountColor = u.totalAmount > 0 ? "text-emerald-700" : "text-gray-400";
-                    const isZero = u.totalAmount === 0;
-
-                    const tr = document.createElement('tr');
-                    tr.className = `hover:bg-gray-50 transition text-xs sm:text-base ${isZero ? 'bg-gray-50/50' : ''}`;
-                    tr.innerHTML = `
-                        <td class="px-2 py-3 sm:p-4 border-b">
-                            <div class="flex items-center">
-                                ${adminAvatar}
-                                <div>
-                                    <div class="font-bold text-gray-800 leading-tight flex items-center gap-2">
-                                        ${u.name}
-                                        ${isZero ? '<span class="bg-gray-200 text-gray-600 text-[9px] px-1.5 rounded-full font-normal">No Donation</span>' : ''}
-                                    </div>
-                                    <div class="text-[10px] sm:text-sm text-gray-500 mt-0.5 sm:mt-1"><i class="fas fa-phone-alt text-[9px] sm:text-xs mr-1"></i>${u.mobile}</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-2 py-3 sm:p-4 border-b text-center align-middle">
-                            <div class="font-bold text-sm sm:text-lg ${amountColor} mb-1">৳${u.totalAmount.toLocaleString('en-IN')}</div>
-                            <div class="text-[9px] sm:text-[11px] text-gray-500 font-semibold bg-gray-100 inline-block px-1.5 py-0.5 sm:px-2 rounded-full">${u.donationsCount} বার অনুদান</div>
-                        </td>
-                        <td class="px-2 py-3 sm:p-4 border-b text-center align-middle">
-                            <button onclick="viewUserHistory('${u.mobile}')" class="${isZero ? 'opacity-50 cursor-not-allowed bg-gray-100 border-gray-200 text-gray-400' : 'bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-600'} px-2 py-1 sm:px-3 sm:py-1.5 rounded shadow-sm text-[10px] sm:text-sm font-semibold transition flex items-center justify-center mx-auto gap-1" ${isZero ? 'disabled' : ''}>
-                                <i class="fas fa-history"></i> <span class="hidden sm:inline">হিস্ট্রি</span>
-                            </button>
-                        </td>
-                    `;
-                    tbody.appendChild(tr);
-                });
-            }
+        const tr = document.createElement('tr');
+        tr.className = `hover:bg-gray-50 transition text-xs sm:text-base ${isZero ? 'bg-gray-50/50' : ''}`;
+        tr.innerHTML = `
+            <td class="px-2 py-3 sm:p-4 border-b">
+                <div class="flex items-center">
+                    ${adminAvatar}
+                    <div>
+                        <div class="font-bold text-gray-800 leading-tight flex items-center gap-2">
+                            ${u.name}
+                        </div>
+                        <div class="text-[10px] sm:text-sm text-gray-500 mt-0.5 sm:mt-1"><i class="fas fa-phone-alt text-[9px] sm:text-xs mr-1"></i>${u.mobile}</div>
+                    </div>
+                </div>
+            </td>
+            <td class="px-2 py-3 sm:p-4 border-b text-center align-middle">
+                <div class="font-bold text-sm sm:text-lg ${amountColor} mb-1">৳${totalAmt.toLocaleString('en-IN')}</div>
+                <div class="text-[9px] sm:text-[11px] text-gray-500 font-semibold bg-gray-100 inline-block px-1.5 py-0.5 sm:px-2 rounded-full">${totalCnt} বার অনুদান</div>
+            </td>
+            <td class="px-2 py-3 sm:p-4 border-b text-center align-middle">
+                <button onclick="viewUserHistory('${u.mobile}')" class="${isZero ? 'opacity-50 cursor-not-allowed bg-gray-100 border-gray-200 text-gray-400' : 'bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-600'} px-2 py-1 sm:px-3 sm:py-1.5 rounded shadow-sm text-[10px] sm:text-sm font-semibold transition flex items-center justify-center mx-auto gap-1" ${isZero ? 'disabled' : ''}>
+                    <i class="fas fa-history"></i> <span class="hidden sm:inline">হিস্ট্রি</span>
+                </button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
             // ---- TARGETS (SPLIT VIEW) TAB ----
             else if (window.currentFilter === 'targets') {
                 let contentHtml = '';
@@ -587,129 +681,330 @@ const firebaseConfig = {
 
                 tbody.innerHTML = contentHtml;
             }
-        }
-
-       // হিস্ট্রি দেখার ফাংশন
-        window.viewUserHistory = function(mobile) {
-            const historyData = window.allDonations.filter(d => d.mobile === mobile && d.status === 'approved');
-            const userName = historyData.length > 0 ? historyData[0].name : "ইউজার";
-
-            let tableRows = '';
-            historyData.forEach(d => {
-                const dateObj = d.timestamp?.toDate ? d.timestamp.toDate() : new Date();
-                const dateStr = dateObj.toLocaleDateString('en-GB');
-                const deleteBtn = `<button onclick="deleteData('${d.id}')" class="text-red-500 hover:text-red-700 ml-2" title="ডিলিট করুন"><i class="fas fa-trash"></i></button>`;
-                const targetBadge = d.isTargetDonation ? `<span class="bg-amber-100 text-amber-700 text-[9px] px-1.5 py-0.5 rounded-full ml-1 align-middle" title="লক্ষ্যমাত্রায় জমা হয়েছে">Target</span>` : '';
-
-                tableRows += `
-                    <tr class="border-b border-gray-200 text-left text-sm hover:bg-gray-50 transition">
-                        <td class="py-3 px-2 text-gray-600 whitespace-nowrap">${dateStr}</td>
-                        <td class="py-3 px-2">
-                            <span class="font-bold text-gray-700">${d.method}</span> ${targetBadge}<br>
-                            <span class="text-[10px] text-gray-400 break-all">${d.trxId}</span>
-                        </td>
-                        <td class="py-3 px-2 text-right font-bold text-emerald-600 whitespace-nowrap">
-                            ৳${d.amount.toLocaleString('en-IN')}
-                            ${deleteBtn}
-                        </td>
+            
+            // ---- EXPENSES TAB ----
+            else if (window.currentFilter === 'expenses') {
+                thead.innerHTML = `
+                    <tr class="bg-red-50 text-red-800 text-[11px] sm:text-sm border-b">
+                        <th class="px-2 py-3 sm:p-4 font-semibold">তারিখ ও বিবরণ</th>
+                        <th class="px-2 py-3 sm:p-4 font-semibold text-right">পরিমাণ</th>
+                        <th class="px-1 py-3 sm:p-4 font-semibold text-center">অ্যাকশন</th>
                     </tr>
                 `;
-            });
 
-            const htmlContent = `
-                <div class="max-h-64 overflow-y-auto mt-2">
-                    <table class="w-full border-collapse">
-                        <thead class="bg-gray-100 text-gray-700 text-sm sticky top-0 shadow-sm">
-                            <tr>
-                                <th class="py-2 px-2 text-left rounded-tl-md">তারিখ</th>
-                                <th class="py-2 px-2 text-left">মাধ্যম</th>
-                                <th class="py-2 px-2 text-right rounded-tr-md">পরিমাণ</th>
-                            </tr>
-                        </thead>
-                        <tbody>${tableRows}</tbody>
-                    </table>
-                </div>
-            `;
+                if (!window.allExpensesData || window.allExpensesData.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="3" class="p-8 text-center text-gray-500 font-medium">কোনো খরচের রেকর্ড নেই।</td></tr>`;
+                    return;
+                }
 
-            Swal.fire({
-                title: `<span class="text-lg font-bold text-gray-800"><i class="fas fa-user-circle text-blue-500 mr-1"></i> ${userName}</span>`,
-                html: htmlContent,
-                showCloseButton: true,
-                showConfirmButton: false,
-                width: '100%',
-                customClass: { popup: 'max-w-md rounded-2xl' }
-            });
+                window.allExpensesData.forEach(ex => {
+                    const dateObj = ex.timestamp ? ex.timestamp.toDate() : new Date();
+                    const dateStr = dateObj.toLocaleDateString('en-GB') + ' ' + dateObj.toLocaleTimeString('en-GB', { hour: '2-digit', minute:'2-digit' });
+                    
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-red-50/50 transition text-xs sm:text-base border-b bg-white";
+                    tr.innerHTML = `
+                        <td class="px-2 py-3 sm:p-4">
+                            <div class="font-bold text-gray-800 text-sm sm:text-base">${ex.reason}</div>
+                            <div class="text-[10px] sm:text-xs text-gray-500 mt-1"><i class="far fa-clock mr-1"></i>${dateStr}</div>
+                        </td>
+                        <td class="px-2 py-3 sm:p-4 text-right align-middle">
+                            <div class="font-bold text-sm sm:text-lg text-red-600">- ৳${ex.amount.toLocaleString('en-IN')}</div>
+                        </td>
+                        <td class="px-1 py-3 sm:p-4 text-center align-middle">
+                            <button onclick="deleteExpense('${ex.id}', ${ex.amount})" class="bg-gray-100 hover:bg-red-100 text-red-500 border border-red-200 px-3 py-1.5 rounded shadow-sm text-[10px] sm:text-sm font-bold transition flex items-center justify-center mx-auto gap-1">
+                                <i class="fas fa-trash"></i> <span class="hidden sm:inline">ডিলিট</span>
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+        }
+
+       // হিস্ট্রি দেখার ফাংশন (সরাসরি ডাটাবেস থেকে টানবে)
+        window.viewUserHistory = async function(mobile) {
+            // প্রথমে লোডিং দেখাবে
+            Swal.fire({ title: 'লোড হচ্ছে...', didOpen: () => Swal.showLoading() });
+
+            try {
+                // ফায়ারবেস থেকে শুধুমাত্র এই নির্দিষ্ট ইউজারের অ্যাপ্রুভড ডাটাগুলো আনবে
+                const q = query(
+                    collection(db, "donations"), 
+                    where("mobile", "==", mobile), 
+                    where("status", "==", "approved")
+                );
+                const snapshot = await getDocs(q);
+
+                let historyData = [];
+                snapshot.forEach(doc => {
+                    let d = doc.data();
+                    d.id = doc.id; // ডিলিট করার জন্য আইডি লাগবে
+                    historyData.push(d);
+                });
+
+                // যদি কোনো হিস্ট্রি না থাকে
+                if (historyData.length === 0) {
+                    Swal.fire('তথ্য নেই', 'এই ইউজারের কোনো অ্যাপ্রুভড অনুদান পাওয়া যায়নি।', 'info');
+                    return;
+                }
+
+                // সময় অনুযায়ী সাজানো (নতুনটা উপরে)
+                historyData.sort((a, b) => b.timestamp.toMillis() - a.timestamp.toMillis());
+
+                const userName = historyData[0].name; // ইউজারের নাম
+
+                let tableRows = '';
+                historyData.forEach(d => {
+                    const dateObj = d.timestamp?.toDate ? d.timestamp.toDate() : new Date();
+                    const dateStr = dateObj.toLocaleDateString('en-GB');
+                    const deleteBtn = `<button onclick="deleteData('${d.id}')" class="text-red-500 hover:text-red-700 ml-2" title="ডিলিট করুন"><i class="fas fa-trash"></i></button>`;
+                    const targetBadge = d.isTargetDonation ? `<span class="bg-amber-100 text-amber-700 text-[9px] px-1.5 py-0.5 rounded-full ml-1 align-middle" title="লক্ষ্যমাত্রায় জমা হয়েছে">Target</span>` : '';
+
+                    // TrxID এর আগে "TrxID:" লেখা বসানোর লজিক
+let trxText = d.trxId;
+if (d.method !== 'ক্যাশ' && !d.trxId.includes('অফলাইন')) {
+    trxText = `<span class="font-bold text-gray-500">TrxID:</span> ${d.trxId}`;
+}
+
+tableRows += `
+    <tr class="border-b border-gray-200 text-left text-sm hover:bg-gray-50 transition">
+        <td class="py-3 px-2 text-gray-600 whitespace-nowrap">${dateStr}</td>
+        <td class="py-3 px-2">
+            <span class="font-bold text-gray-700">${d.method}</span> ${targetBadge}<br>
+            <span class="text-[10px] text-gray-400 break-all">${trxText}</span>
+        </td>
+        <td class="py-3 px-2 text-right font-bold text-emerald-600 whitespace-nowrap">
+            ৳${d.amount.toLocaleString('en-IN')}
+            ${deleteBtn}
+        </td>
+    </tr>
+`;
+                });
+
+                const htmlContent = `
+                    <div class="max-h-64 overflow-y-auto mt-2">
+                        <table class="w-full border-collapse">
+                            <thead class="bg-gray-100 text-gray-700 text-sm sticky top-0 shadow-sm">
+                                <tr>
+                                    <th class="py-2 px-2 text-left rounded-tl-md">তারিখ</th>
+                                    <th class="py-2 px-2 text-left">মাধ্যম</th>
+                                    <th class="py-2 px-2 text-right rounded-tr-md">পরিমাণ</th>
+                                </tr>
+                            </thead>
+                            <tbody>${tableRows}</tbody>
+                        </table>
+                    </div>
+                `;
+
+                Swal.fire({
+                    title: `<span class="text-lg font-bold text-gray-800"><i class="fas fa-user-circle text-blue-500 mr-1"></i> ${userName}</span>`,
+                    html: htmlContent,
+                    showCloseButton: true,
+                    showConfirmButton: false,
+                    width: '100%',
+                    customClass: { popup: 'max-w-md rounded-2xl' }
+                });
+
+            } catch (error) {
+                console.error(error);
+                Swal.fire('ত্রুটি', 'ডাটা লোড করতে সমস্যা হয়েছে।', 'error');
+            }
         }
 
         // Approve Function
         window.approveData = function(id) {
+    Swal.fire({
+        title: 'অ্যাপ্রুভ করবেন?',
+        text: "অ্যাপ্রুভ করলে এটি পাবলিক লিস্টে যুক্ত হবে!",
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#10b981',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'হ্যাঁ',
+        cancelButtonText: 'না'
+    }).then(async (result) => {
+        if (result.isConfirmed) {
+            // ১. পেমেন্টের তথ্য নেওয়া
+            const docRef = doc(db, "donations", id);
+            const docSnap = await getDoc(docRef);
+            const donationData = docSnap.data();
+
+            // ২. স্ট্যাটাস approved করা
+            await updateDoc(docRef, { status: "approved" });
+
+            // ৩. ইউজারের totalAmount এবং totalCount সরাসরি ইউজার কালেকশনে বাড়ানো
+if(donationData && donationData.mobile) {
+    const userRef = doc(db, "users", donationData.mobile);
+    await updateDoc(userRef, {
+        totalAmount: increment(donationData.amount),
+        totalCount: increment(1)  // <-- নতুন যোগ হলো: কয়বার দিয়েছে তার হিসাব
+    }).catch(e => console.log("User doc update error", e));
+}
+
+            // ৪. সিস্টেমের মোট ফান্ড (Total Raised) সেটিংসে আপডেট করা
+            const settingsRef = doc(db, "settings", "general_settings");
+            let settingsUpdate = { totalFund: increment(donationData.amount) };
+            
+            // যদি এটি লক্ষ্যমাত্রার (Target) পেমেন্ট হয়
+            if (donationData.isTargetDonation && donationData.targetSessionId) {
+                settingsUpdate.targetFund = increment(donationData.amount);
+            }
+            
+            await updateDoc(settingsRef, settingsUpdate);
+
+            Swal.fire('সফল!', 'লিস্টে যুক্ত হয়েছে।', 'success');
+        }
+    });
+}
+
+        // Reject or Delete Function (সরাসরি ডিলিট লজিক)
+        window.deleteData = async function(id) {
+            // প্রথমে ডাটাবেস থেকে অনুদানের তথ্যটি পড়ে নিচ্ছি
+            const docRef = doc(db, "donations", id);
+            const docSnap = await getDoc(docRef);
+            
+            if (!docSnap.exists()) return;
+            const donationData = docSnap.data();
+
+            let popupTitle = donationData.status === 'approved' ? 'অ্যাপ্রুভড অনুদান মুছবেন?' : 'রিকোয়েস্টটি বাতিল করবেন?';
+            let popupText = donationData.status === 'approved' 
+                ? "সতর্কতা: এটি মুছলে মোট ফান্ড এবং ইউজারের মোট হিসাব থেকে টাকা কমে যাবে!" 
+                : "বাতিল করলে রিকোয়েস্টটি ডাটাবেস থেকে চিরতরে মুছে যাবে।";
+
             Swal.fire({
-                title: 'অ্যাপ্রুভ করবেন?',
-                text: "অ্যাপ্রুভ করলে এটি পাবলিক লিস্টে যুক্ত হবে!",
-                icon: 'question',
+                title: popupTitle,
+                text: popupText,
+                icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#10b981',
+                confirmButtonColor: '#ef4444',
                 cancelButtonColor: '#6b7280',
-                confirmButtonText: 'হ্যাঁ',
+                confirmButtonText: 'হ্যাঁ, মুছে ফেলুন',
                 cancelButtonText: 'না'
             }).then(async (result) => {
                 if (result.isConfirmed) {
-                    await updateDoc(doc(db, "donations", id), { status: "approved" });
-                    Swal.fire('সফল!', 'লিস্টে যুক্ত হয়েছে।', 'success');
+                    
+                    if (donationData.status === 'approved') {
+                        // যদি আগে অ্যাপ্রুভ হয়ে থাকে, তবে ডিলিট করার আগে হিসাব থেকে মাইনাস করতে হবে
+                        
+                        // ১. ইউজার কালেকশন থেকে মাইনাস
+if(donationData.mobile) {
+    const userRef = doc(db, "users", donationData.mobile);
+    await updateDoc(userRef, { 
+        totalAmount: increment(-donationData.amount),
+        totalCount: increment(-1) // <-- নতুন যোগ হলো: হিসাব কমানো
+    }).catch(e => console.log(e));
+}
+
+                        // ২. মূল ফান্ড থেকে মাইনাস করার লজিক
+                        const settingsRef = doc(db, "settings", "general_settings");
+                        const setSnap = await getDoc(settingsRef);
+
+                        if(setSnap.exists()) {
+                            let currentTotalFund = setSnap.data().totalFund || 0;
+                            
+                            // মাইনাস চেক করা (যাতে নেগেটিভ না হয়)
+                            let deductAmount = donationData.amount;
+                            if(currentTotalFund < deductAmount) {
+                                deductAmount = currentTotalFund; 
+                            }
+
+                            let settingsUpdate = { totalFund: increment(-deductAmount) };
+
+                            // লক্ষ্যমাত্রার ফান্ড থেকেও নিরাপদ মাইনাস
+                            if (donationData.isTargetDonation && donationData.targetSessionId) {
+                                let currentTargetFund = setSnap.data().targetFund || 0;
+                                let deductTargetAmount = donationData.amount;
+                                if(currentTargetFund < deductTargetAmount) deductTargetAmount = currentTargetFund;
+                                
+                                settingsUpdate.targetFund = increment(-deductTargetAmount);
+                            }
+
+                            await updateDoc(settingsRef, settingsUpdate);
+                        }
+                        
+                        // ৩. এবার ডাটাবেস থেকে চিরতরে মুছে ফেলা
+                        await deleteDoc(docRef);
+                        Swal.fire('মুছে ফেলা হয়েছে!', 'ফান্ডের হিসাব আপডেট হয়েছে।', 'success');
+                    } else {
+                        // *** যদি পেন্ডিং থাকে, তবে সাথে সাথে চিরতরে মুছে ফেলা হবে ***
+                        await deleteDoc(docRef);
+                        Swal.fire('মুছে ফেলা হয়েছে!', 'রিকোয়েস্টটি তালিকা থেকে চিরতরে মুছে ফেলা হয়েছে।', 'success');
+                    }
                 }
             });
         }
 
-        // Reject Function (Instead of direct delete)
-window.deleteData = function(id) {
-    Swal.fire({
-        title: 'রিকোয়েস্টটি বাতিল করবেন?',
-        text: "বাতিল করলে ইউজার তার হিস্ট্রিতে এটি 'বাতিল হয়েছে' হিসেবে দেখতে পাবে এবং ৩ দিন পর এটি চিরতরে ডাটাবেস থেকে মুছে যাবে।",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#ef4444',
-        cancelButtonColor: '#6b7280',
-        confirmButtonText: 'হ্যাঁ, বাতিল করুন',
-        cancelButtonText: 'না'
-    }).then(async (result) => {
-        if (result.isConfirmed) {
-            // deleteDoc এর বদলে updateDoc দিয়ে স্ট্যাটাস rejected করে দিচ্ছি এবং একটি সময় যুক্ত করছি
-            await updateDoc(doc(db, "donations", id), { 
-                status: "rejected",
-                rejectedAt: new Date() 
-            });
-            Swal.fire('বাতিল করা হয়েছে!', '', 'success');
-        }
+        window.setFilter = async function(type) {
+    window.currentFilter = type;
+    const btnP = document.getElementById('btnPending');
+    const btnU = document.getElementById('btnUsers');
+    const btnT = document.getElementById('btnTargets');
+    const btnE = document.getElementById('btnExpenses'); // নতুন লাইন
+    const titleText = document.getElementById('tableMainTitle');
+
+    // এখানে btnE যোগ করা হয়েছে
+    [btnP, btnU, btnT, btnE].forEach(btn => { 
+        if(btn) btn.className = "px-3 sm:px-4 py-1.5 rounded-md text-xs sm:text-sm font-semibold text-gray-600 hover:text-gray-800 transition"; 
     });
-} 
 
-        // ফিল্টার ট্যাব লজিক
-        window.setFilter = function(type) {
-            window.currentFilter = type;
-            const btnP = document.getElementById('btnPending');
-            const btnU = document.getElementById('btnUsers');
-            const btnT = document.getElementById('btnTargets');
-            const titleText = document.getElementById('tableMainTitle');
-
-            // সব বাটন রিসেট
-            [btnP, btnU, btnT].forEach(btn => btn.className = "px-3 sm:px-4 py-1.5 rounded-md text-xs sm:text-sm font-semibold text-gray-600 hover:text-gray-800 transition");
-
-            // অ্যাক্টিভ বাটন স্টাইল ও টাইটেল পরিবর্তন
-            if(type === 'pending') {
-                btnP.className = "px-3 sm:px-4 py-1.5 rounded-md text-xs sm:text-sm font-semibold bg-white shadow text-emerald-700 transition";
-                titleText.innerHTML = '<i class="fas fa-list-alt text-emerald-600 mr-2"></i> অনুদানের তালিকা';
-            }
-            if(type === 'users') {
-                btnU.className = "px-3 sm:px-4 py-1.5 rounded-md text-xs sm:text-sm font-semibold bg-white shadow text-emerald-700 transition";
-                titleText.innerHTML = '<i class="fas fa-users text-blue-500 mr-2"></i> দাতাদের তালিকা';
-            }
-            if(type === 'targets') {
-                btnT.className = "px-3 sm:px-4 py-1.5 rounded-md text-xs sm:text-sm font-semibold bg-white shadow text-emerald-700 transition";
-                titleText.innerHTML = '<i class="fas fa-bullseye text-amber-500 mr-2"></i> লক্ষ্যমাত্রা তালিকা';
-            }
-            
-            window.renderTable();
+    if(type === 'pending') {
+        btnP.className = "px-3 sm:px-4 py-1.5 rounded-md text-xs sm:text-sm font-semibold bg-white shadow text-emerald-700 transition";
+        titleText.innerHTML = '<i class="fas fa-list-alt text-emerald-600 mr-2"></i> অনুদানের তালিকা';
+        window.renderTable();
+    }
+    
+    // যখন ইউজার ট্যাবে ক্লিক করবে, শুধু তখনই ফায়ারবেস থেকে ডাটা টানবে
+    if(type === 'users') {
+    btnU.className = "px-3 sm:px-4 py-1.5 rounded-md text-xs sm:text-sm font-semibold bg-white shadow text-emerald-700 transition";
+    titleText.innerHTML = '<i class="fas fa-users text-blue-500 mr-2"></i> টপ ২০ দাতার তালিকা';
+    
+    Swal.fire({ title: 'লোড হচ্ছে...', didOpen: () => Swal.showLoading() });
+    
+    // লিমিট ব্যবহার করে শুধুমাত্র যারা বেশি টাকা দিয়েছে এমন ২০ জনকে আনবে
+    const userQuery = query(collection(db, "users"), orderBy("totalAmount", "desc"), limit(20));
+    const userSnap = await getDocs(userQuery);
+    
+    window.allUsersData = [];
+    userSnap.forEach(doc => window.allUsersData.push(doc.data()));
+    
+    Swal.close();
+    window.renderTable();
+}
+    
+    // যখন টার্গেট ট্যাবে ক্লিক করবে, তখন ডাটা টানবে
+    if(type === 'targets') {
+        btnT.className = "px-3 sm:px-4 py-1.5 rounded-md text-xs sm:text-sm font-semibold bg-white shadow text-emerald-700 transition";
+        titleText.innerHTML = '<i class="fas fa-bullseye text-amber-500 mr-2"></i> লক্ষ্যমাত্রা তালিকা';
+        
+        if (window.allPastTargets.length === 0) {
+            Swal.fire({ title: 'লোড হচ্ছে...', didOpen: () => Swal.showLoading() });
+            const targetSnap = await getDocs(query(collection(db, "past_targets"), orderBy("timestamp", "desc")));
+            window.allPastTargets = [];
+            targetSnap.forEach(doc => {
+                let data = doc.data(); data.id = doc.id;
+                window.allPastTargets.push(data);
+            });
+            Swal.close();
         }
+        window.renderTable();
+    }
+    // খরচের ট্যাব
+    if(type === 'expenses') {
+        btnE.className = "px-3 sm:px-4 py-1.5 rounded-md text-xs sm:text-sm font-semibold bg-white shadow text-red-700 transition";
+        titleText.innerHTML = '<i class="fas fa-file-invoice-dollar text-red-500 mr-2"></i> খরচের তালিকা';
+        
+        Swal.fire({ title: 'লোড হচ্ছে...', didOpen: () => Swal.showLoading() });
+        const exSnap = await getDocs(query(collection(db, "expenses"), orderBy("timestamp", "desc")));
+        window.allExpensesData = [];
+        exSnap.forEach(doc => {
+            let data = doc.data(); data.id = doc.id;
+            window.allExpensesData.push(data);
+        });
+        Swal.close();
+        window.renderTable();
+    }
+}
 
         // লগইন লজিক (ডাটাবেস + অফলাইন ফলব্যাক)
         window.checkLogin = async function() {
@@ -913,148 +1208,152 @@ window.deleteData = function(id) {
             document.getElementById('settingsModal').classList.add('hidden');
         }
 
-        // আসল .xlsx এক্সেল ফাইল ডাউনলোড করার ফাংশন
-        window.downloadExcel = function(sessionId, reason) {
-            const targetDonations = window.allDonations.filter(d => d.targetSessionId === sessionId && d.status === 'approved');
-            
-            if (targetDonations.length === 0) {
-                Swal.fire('দুঃখিত', 'ডাউনলোড করার মতো কোনো ডাটা নেই।', 'info');
-                return;
-            }
+        
+// ========================================================
+// আপডেট: সরাসরি ডাটাবেস থেকে টার্গেটের ডাটা এনে এক্সেল ডাউনলোড
+// ========================================================
+window.downloadExcel = async function(sessionId, reason) {
+    Swal.fire({ title: 'ডাটা প্রস্তুত হচ্ছে...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
-            // ডাটাগুলোকে সময়ের ভিত্তিতে সাজানো
-            targetDonations.sort((a, b) => b.timestamp - a.timestamp);
+    try {
+        // ডাটাবেস থেকে শুধু ওই টার্গেটের অ্যাপ্রুভড ডাটাগুলো আনা হচ্ছে
+        const q = query(collection(db, "donations"), where("targetSessionId", "==", sessionId), where("status", "==", "approved"));
+        const snapshot = await getDocs(q);
 
-            let totalAmount = 0;
-            const uniqueDonors = new Set(); // ইউনিক ডোনার গোনার জন্য
+        let targetDonations = [];
+        snapshot.forEach(doc => targetDonations.push(doc.data()));
 
-            // এক্সেলের জন্য প্রপার ডাটা ফরম্যাট তৈরি
-            const excelData = targetDonations.map((d, index) => {
-                const dateStr = d.timestamp?.toDate ? d.timestamp.toDate().toLocaleDateString('en-GB') : '';
+        if (targetDonations.length === 0) {
+            Swal.fire('দুঃখিত', 'ডাউনলোড করার মতো কোনো ডাটা নেই।', 'info');
+            return;
+        }
+
+        // সময়ের ভিত্তিতে সাজানো
+        targetDonations.sort((a, b) => b.timestamp.toMillis() - a.timestamp.toMillis());
+
+        let totalAmount = 0;
+        const uniqueDonors = new Set();
+
+        const excelData = targetDonations.map((d, index) => {
+            const dateStr = d.timestamp?.toDate ? d.timestamp.toDate().toLocaleDateString('en-GB') : '';
+            totalAmount += (d.amount || 0);
+            if(d.mobile) uniqueDonors.add(d.mobile);
+
+            return {
+                "ক্রমিক নং": index + 1,
+                "তারিখ": dateStr,
+                "নাম": d.name || 'অজ্ঞাত',
+                "মোবাইল নম্বর": d.mobile || '',
+                "পেমেন্ট মাধ্যম": d.method || '',
+                "TrxID বা নম্বর": d.trxId || '',
+                "পরিমাণ (৳)": d.amount || 0
+            };
+        });
+
+        excelData.push({ "ক্রমিক নং": "", "তারিখ": "", "নাম": "", "মোবাইল নম্বর": "", "পেমেন্ট মাধ্যম": "", "TrxID বা নম্বর": "", "পরিমাণ (৳)": "" });
+        excelData.push({
+            "ক্রমিক নং": "", "তারিখ": "", "নাম": "", "মোবাইল নম্বর": "", 
+            "পেমেন্ট মাধ্যম": `মোট ডোনার: ${uniqueDonors.size} জন`, 
+            "TrxID বা নম্বর": "সর্বমোট সংগ্রহ:", "পরিমাণ (৳)": totalAmount
+        });
+
+        const worksheet = XLSX.utils.json_to_sheet(excelData);
+        worksheet['!cols'] = [{ wch: 10 }, { wch: 15 }, { wch: 25 }, { wch: 15 }, { wch: 20 }, { wch: 20 }, { wch: 15 }];
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Donations");
+
+        Swal.close();
+        XLSX.writeFile(workbook, `${reason}_Donations.xlsx`);
+
+    } catch (error) {
+        console.error(error);
+        Swal.fire('ত্রুটি', 'এক্সেল ফাইল তৈরি করতে সমস্যা হয়েছে।', 'error');
+    }
+};
+
+// ========================================================
+// আপডেট: সরাসরি ডাটাবেস থেকে টার্গেটের বিস্তারিত দেখা
+// ========================================================
+window.viewTargetDetails = async function(sessionId, reason, targetAmount) {
+    Swal.fire({ title: 'লোড হচ্ছে...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+    try {
+        // সরাসরি ডাটাবেস থেকে ডাটা আনা হচ্ছে
+        const q = query(collection(db, "donations"), where("targetSessionId", "==", sessionId), where("status", "==", "approved"));
+        const snapshot = await getDocs(q);
+
+        let targetDonations = [];
+        let totalRaised = 0;
+
+        snapshot.forEach(doc => {
+            let d = doc.data();
+            targetDonations.push(d);
+            totalRaised += d.amount;
+        });
+
+        targetDonations.sort((a, b) => b.timestamp.toMillis() - a.timestamp.toMillis());
+
+        let listHtml = '';
+        if (targetDonations.length === 0) {
+            listHtml = `<div class="p-4 text-center text-gray-500">কেউ অনুদান দেননি।</div>`;
+        } else {
+            targetDonations.forEach(d => {
+                const avatar = d.photo ? `<img src="${d.photo}" class="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover shrink-0">` : `<div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 shrink-0"><i class="fas fa-user"></i></div>`;
                 
-                totalAmount += (d.amount || 0); // মোট টাকা হিসাব হচ্ছে
-                if(d.mobile) uniqueDonors.add(d.mobile); // মোট ডোনার হিসাব হচ্ছে
+                let methodColor = "bg-gray-100 text-gray-700";
+                if(d.method === 'বিকাশ') methodColor = "bg-pink-100 text-pink-700";
+                if(d.method === 'ন নগদ') methodColor = "bg-orange-100 text-orange-700";
+                if(d.method === 'রকেট') methodColor = "bg-purple-100 text-purple-700";
+                if(d.method === 'ক্যাশ') methodColor = "bg-green-100 text-green-700";
 
-                return {
-                    "ক্রমিক নং": index + 1,
-                    "তারিখ": dateStr,
-                    "নাম": d.name || 'অজ্ঞাত',
-                    "মোবাইল নম্বর": d.mobile || '',
-                    "পেমেন্ট মাধ্যম": d.method || '',
-                    "TrxID বা নম্বর": d.trxId || '',
-                    "পরিমাণ (৳)": d.amount || 0
-                };
-            });
-
-            // এক্সেল শিটে একটি ফাঁকা লাইন (স্পেস) দেওয়া
-            excelData.push({
-                "ক্রমিক নং": "", "তারিখ": "", "নাম": "", "মোবাইল নম্বর": "", "পেমেন্ট মাধ্যম": "", "TrxID বা নম্বর": "", "পরিমাণ (৳)": ""
-            });
-
-            // সবার নিচে মোট ডোনার এবং মোট টাকার হিসাব যোগ করা
-            excelData.push({
-                "ক্রমিক নং": "",
-                "তারিখ": "",
-                "নাম": "",
-                "মোবাইল নম্বর": "",
-                "পেমেন্ট মাধ্যম": `মোট ডোনার: ${uniqueDonors.size} জন`,
-                "TrxID বা নম্বর": "সর্বমোট সংগ্রহ:",
-                "পরিমাণ (৳)": totalAmount
-            });
-
-            // SheetJS এর মাধ্যমে ওয়ার্কশিট এবং ওয়ার্কবুক তৈরি
-            const worksheet = XLSX.utils.json_to_sheet(excelData);
-            
-            // কলামের সাইজ ঠিক করা
-            worksheet['!cols'] = [
-                { wch: 10 },  // ক্রমিক
-                { wch: 15 },  // তারিখ
-                { wch: 25 },  // নাম
-                { wch: 15 },  // মোবাইল
-                { wch: 20 },  // মাধ্যম (সাইজ একটু বাড়ানো হলো)
-                { wch: 20 },  // TrxID
-                { wch: 15 }   // পরিমাণ
-            ];
-
-            const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "Donations List");
-
-            // ফাইল ডাউনলোড করা
-            XLSX.writeFile(workbook, `${reason}_Donations.xlsx`);
-        };
-
-        // লক্ষ্যমাত্রার বিস্তারিত দেখার ফাংশন
-        window.viewTargetDetails = function(sessionId, reason, targetAmount) {
-            const targetDonations = window.allDonations.filter(d => d.targetSessionId === sessionId && d.status === 'approved');
-            
-            let totalRaised = 0;
-            targetDonations.forEach(d => totalRaised += d.amount);
-
-            // নতুন পেমেন্টগুলো উপরে দেখানোর জন্য সর্টিং
-            targetDonations.sort((a, b) => b.timestamp - a.timestamp);
-
-            let listHtml = '';
-            if (targetDonations.length === 0) {
-                listHtml = `<div class="p-4 text-center text-gray-500">কেউ অনুদান দেননি।</div>`;
-            } else {
-                targetDonations.forEach(d => {
-                    const avatar = d.photo ? `<img src="${d.photo}" class="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover shrink-0">` : `<div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 shrink-0"><i class="fas fa-user text-xs sm:text-base"></i></div>`;
-                    
-                    // মাধ্যম অনুযায়ী ব্যাজ কালার
-                    let methodColor = "bg-gray-100 text-gray-700";
-                    if(d.method === 'বিকাশ') methodColor = "bg-pink-100 text-pink-700";
-                    if(d.method === 'নগদ') methodColor = "bg-orange-100 text-orange-700";
-                    if(d.method === 'রকেট') methodColor = "bg-purple-100 text-purple-700";
-                    if(d.method === 'ক্যাশ') methodColor = "bg-green-100 text-green-700";
-
-                    listHtml += `
-                        <div class="flex items-center p-2 border-b border-gray-100 hover:bg-gray-50 text-left transition">
-                            ${avatar}
-                            <div class="ml-2 w-1/3">
-                                <div class="text-[12px] sm:text-sm font-bold text-gray-800 leading-tight truncate" title="${d.name}">${d.name}</div>
-                                <div class="text-[9px] sm:text-xs text-gray-500">${d.mobile}</div>
-                            </div>
-                            <div class="flex-1 px-1 text-center">
-                                <span class="inline-block text-[9px] sm:text-[10px] font-bold px-1.5 py-0.5 rounded ${methodColor}">${d.method}</span>
-                                <div class="text-[9px] sm:text-[10px] text-gray-400 mt-0.5 font-mono break-all line-clamp-1" title="${d.trxId}">${d.trxId || ''}</div>
-                            </div>
-                            <div class="text-[13px] sm:text-base font-bold text-emerald-600 text-right shrink-0">
-                                ৳${d.amount.toLocaleString('en-IN')}
-                            </div>
+                listHtml += `
+                    <div class="flex items-center p-2 border-b border-gray-100 hover:bg-gray-50 text-left transition">
+                        ${avatar}
+                        <div class="ml-2 w-1/3">
+                            <div class="text-[12px] sm:text-sm font-bold text-gray-800 leading-tight truncate">${d.name}</div>
+                            <div class="text-[9px] sm:text-xs text-gray-500">${d.mobile}</div>
                         </div>
-                    `;
-                });
-            }
-
-            const htmlContent = `
-                <div class="bg-blue-50 p-3 rounded-lg mb-4 mt-2 border border-blue-100 text-center relative">
-                    <div class="text-xs text-gray-500">লক্ষ্যমাত্রা (টার্গেট)</div>
-                    <div class="text-lg font-bold text-blue-700">৳${targetAmount.toLocaleString('en-IN')}</div>
-                    
-                    <div class="text-xs text-gray-500 mt-2">সর্বমোট সংগ্রহ হয়েছে</div>
-                    <div class="text-xl font-bold text-emerald-600">৳${totalRaised.toLocaleString('en-IN')}</div>
-                </div>
-
-                <div class="flex justify-between items-center border-b border-gray-200 pb-2 mb-2">
-                    <div class="text-left font-bold text-gray-700 text-sm"><i class="fas fa-users text-amber-500"></i> দাতাদের তালিকা:</div>
-                    <button onclick="downloadExcel('${sessionId}', '${reason}')" class="text-emerald-700 bg-emerald-100 hover:bg-emerald-200 border border-emerald-200 px-3 py-1.5 rounded-md text-[11px] font-bold transition flex items-center gap-1 shadow-sm">
-                        <i class="fas fa-file-excel text-emerald-600"></i> Excel ডাউনলোড
-                    </button>
-                </div>
-
-                <div class="max-h-60 overflow-y-auto pr-1">
-                    ${listHtml}
-                </div>
-            `;
-
-            Swal.fire({
-                title: `<span class="text-lg font-bold text-gray-800">${reason}</span>`,
-                html: htmlContent,
-                showCloseButton: true,
-                showConfirmButton: false,
-                customClass: { popup: 'rounded-2xl w-[95%] sm:max-w-md' }
+                        <div class="flex-1 px-1 text-center">
+                            <span class="inline-block text-[9px] sm:text-[10px] font-bold px-1.5 py-0.5 rounded ${methodColor}">${d.method}</span>
+                            <div class="text-[9px] sm:text-[10px] text-gray-400 mt-0.5 font-mono break-all line-clamp-1">${d.trxId || ''}</div>
+                        </div>
+                        <div class="text-[13px] sm:text-base font-bold text-emerald-600 text-right shrink-0">
+                            ৳${d.amount.toLocaleString('en-IN')}
+                        </div>
+                    </div>
+                `;
             });
         }
+
+        const htmlContent = `
+            <div class="bg-blue-50 p-3 rounded-lg mb-4 mt-2 border border-blue-100 text-center relative">
+                <div class="text-xs text-gray-500">লক্ষ্যমাত্রা (টার্গেট)</div>
+                <div class="text-lg font-bold text-blue-700">৳${targetAmount.toLocaleString('en-IN')}</div>
+                <div class="text-xs text-gray-500 mt-2">সর্বমোট সংগ্রহ হয়েছে</div>
+                <div class="text-xl font-bold text-emerald-600">৳${totalRaised.toLocaleString('en-IN')}</div>
+            </div>
+            <div class="flex justify-between items-center border-b border-gray-200 pb-2 mb-2">
+                <div class="text-left font-bold text-gray-700 text-sm"><i class="fas fa-users text-amber-500"></i> দাতাদের তালিকা:</div>
+                <button onclick="downloadExcel('${sessionId}', '${reason}')" class="text-emerald-700 bg-emerald-100 hover:bg-emerald-200 border border-emerald-200 px-3 py-1.5 rounded-md text-[11px] font-bold transition flex items-center gap-1 shadow-sm">
+                    <i class="fas fa-file-excel text-emerald-600"></i> Excel ডাউনলোড
+                </button>
+            </div>
+            <div class="max-h-60 overflow-y-auto pr-1">${listHtml}</div>
+        `;
+
+        Swal.fire({
+            title: `<span class="text-lg font-bold text-gray-800">${reason}</span>`,
+            html: htmlContent,
+            showCloseButton: true,
+            showConfirmButton: false,
+            customClass: { popup: 'rounded-2xl w-[95%] sm:max-w-md' }
+        });
+
+    } catch (error) {
+        console.error(error);
+        Swal.fire('ত্রুটি', 'ডাটা লোড করতে সমস্যা হয়েছে।', 'error');
+    }
+}
 
         // হিস্ট্রি থেকে লক্ষ্যমাত্রা ডিলিট করা
         window.deletePastTarget = function(id) {
@@ -1073,7 +1372,368 @@ window.deleteData = function(id) {
                 }
             });
         }
+// ==========================================
+        // ম্যানুয়াল ডোনেশন সিস্টেম (অফলাইন ক্যাশ জমা)
+        // ==========================================
+        import { addDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
+        // নাম্বার ইংরেজিতে করার ফাংশন
+        const bdToEngNum = str => str.replace(/[০-৯]/g, w => '০১২৩৪৫৬৭৮৯'.indexOf(w));
+        const formatMobile = num => { let n = bdToEngNum(num).replace(/\D/g, ''); if(n.startsWith('88')) n = n.slice(2); return n; };
+
+        let currentManualUser = null;
+
+        // মোডাল ওপেন করা এবং রিসেট করা
+        window.openManualModal = function() {
+            document.getElementById('manualSearchMobile').value = '';
+            document.getElementById('manualAmount').value = '';
+            document.getElementById('manualStep1').classList.remove('hidden');
+            document.getElementById('manualStep2').classList.add('hidden');
+            document.getElementById('manualStep3').classList.add('hidden');
+            document.getElementById('manualDonationModal').classList.remove('hidden');
+        }
+
+        window.closeManualModal = function() {
+            document.getElementById('manualDonationModal').classList.add('hidden');
+        }
+
+        // স্টেপ ১: নাম্বার চেক করা
+        window.checkManualMobile = async function() {
+            const rawMobile = document.getElementById('manualSearchMobile').value;
+            const mobile = formatMobile(rawMobile);
+
+            if(mobile.length !== 11 || !mobile.startsWith('01')) {
+                Swal.fire('ভুল নাম্বার', 'সঠিক ১১ ডিজিটের মোবাইল নাম্বার দিন।', 'warning');
+                return;
+            }
+
+            const btn = document.getElementById('btnCheckMobile');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; btn.disabled = true;
+
+            try {
+                const docSnap = await getDoc(doc(db, "users", mobile));
+                
+                if (docSnap.exists()) {
+                    // একাউন্ট আছে - স্টেপ ২ এ পাঠানো
+                    currentManualUser = docSnap.data();
+                    setupStep2();
+                } else {
+                    // একাউন্ট নেই - এলার্ট দিয়ে স্টেপ ৩ এ পাঠানো
+                    Swal.fire({
+                        title: 'অ্যাকাউন্ট নেই!',
+                        text: 'এই নাম্বারে কোনো অ্যাকাউন্ট পাওয়া যায়নি। আপনি কি নতুন অ্যাকাউন্ট তৈরি করতে চান?',
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonText: 'হ্যাঁ, তৈরি করব',
+                        cancelButtonText: 'না'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            document.getElementById('manualStep1').classList.add('hidden');
+                            document.getElementById('manualStep3').classList.remove('hidden');
+                            document.getElementById('regManualMobile').value = mobile;
+                            document.getElementById('regManualName').value = '';
+                            document.getElementById('regManualImage').value = '';
+                        }
+                    });
+                }
+            } catch(error) {
+                Swal.fire('ত্রুটি', 'সার্ভার চেক করতে সমস্যা হয়েছে।', 'error');
+            }
+            btn.innerHTML = '<i class="fas fa-search"></i> খুঁজুন'; btn.disabled = false;
+        }
+
+        // স্টেপ ২: ডাটা বসানো এবং টার্গেট চেক করা
+        function setupStep2() {
+            document.getElementById('manualStep1').classList.add('hidden');
+            document.getElementById('manualStep3').classList.add('hidden');
+            document.getElementById('manualStep2').classList.remove('hidden');
+
+            document.getElementById('manualUserName').innerText = currentManualUser.name;
+            document.getElementById('manualUserPhone').innerText = currentManualUser.mobile;
+            document.getElementById('manualUserPic').src = currentManualUser.photo || 'https://via.placeholder.com/150';
+
+            const targetBox = document.getElementById('manualTargetInfo');
+            if (window.activeTargetInfo) {
+                targetBox.className = "text-center text-sm font-bold p-2 rounded mb-4 bg-amber-100 text-amber-700 border border-amber-300";
+                targetBox.innerHTML = `<i class="fas fa-bullseye"></i> এই টাকা <b>"${window.activeTargetInfo.reason}"</b> লক্ষ্যমাত্রায় যুক্ত হবে।`;
+            } else {
+                targetBox.className = "text-center text-sm font-bold p-2 rounded mb-4 bg-blue-100 text-blue-700 border border-blue-300";
+                targetBox.innerHTML = `<i class="fas fa-globe"></i> এই টাকা <b>"সাধারণ অনুদান"</b> হিসেবে যুক্ত হবে।`;
+            }
+        }
+// --- Image Compression Function (সাইজ কমানোর জন্য) ---
+        function compressImage(file) {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = event => {
+                    const img = new Image();
+                    img.src = event.target.result;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        let w = img.width, h = img.height;
+                        if(w > 400) { h = Math.round(h * 400/w); w = 400; }
+                        canvas.width = w; canvas.height = h;
+                        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                        canvas.toBlob(blob => resolve(blob), 'image/jpeg', 0.6);
+                    };
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+        // স্টেপ ৩: সরাসরি নতুন একাউন্ট তৈরি করা (ছবি অপশনাল)
+        window.createManualUser = async function() {
+            const mobile = document.getElementById('regManualMobile').value;
+            const name = document.getElementById('regManualName').value.trim();
+            const file = document.getElementById('regManualImage').files[0];
+
+            // এখন শুধু নাম চেক করবে, ছবি না দিলেও কাজ করবে
+            if(!name) {
+                Swal.fire('সতর্কতা', 'দয়া করে দাতার নাম লিখুন।', 'warning');
+                return;
+            }
+
+            const btn = document.getElementById('btnCreateManualUser');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> একাউন্ট তৈরি হচ্ছে...'; btn.disabled = true;
+
+            try {
+                // আপনার দেওয়া ডিফল্ট ছবি
+                let photoUrl = "https://i.ibb.co.com/20yk3FVc/3541871.png";
+
+                // যদি অ্যাডমিন ছবি সিলেক্ট করে, তবে সাইজ কমিয়ে আপলোড হবে
+                if (file) {
+                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ছবি সাইজ কমানো হচ্ছে...';
+                    
+                    // ১. প্রথমে ছবিটির সাইজ কমানো হবে
+                    const compressedBlob = await compressImage(file);
+                    
+                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> আপলোড হচ্ছে...';
+                    
+                    // ২. কমানো সাইজের ছবিটি আপলোড করা হবে
+                    const formData = new FormData();
+                    formData.append('image', compressedBlob, 'avatar.jpg');
+                    const imgbbResponse = await fetch(`https://api.imgbb.com/1/upload?key=2c15582c6548f043b824081421986562`, { method: 'POST', body: formData });
+                    const imgData = await imgbbResponse.json();
+                    photoUrl = imgData.data.url;
+                }
+
+                // নামটাকে ছোট হাতের করে ভেঙে Array বানানো হচ্ছে
+const nameLower = name.toLowerCase();
+const nameKeywords = nameLower.split(" "); 
+
+const userData = { 
+    name: name, 
+    mobile: mobile, 
+    photo: photoUrl, 
+    createdAt: new Date(), 
+    totalAmount: 0,
+    totalCount: 0,
+    keywords: nameKeywords // <-- এই লাইনটি নতুন যোগ করতে হবে
+};
+await setDoc(doc(db, "users", mobile), userData);
+
+                Swal.fire({icon: 'success', title: 'একাউন্ট তৈরি হয়েছে!', toast: true, position: 'top-end', timer: 2000, showConfirmButton: false});
+                
+                // ইউজার ডাটা কারেন্ট ইউজারে সেট করে স্টেপ ২ তে নিয়ে যাওয়া
+                currentManualUser = userData;
+                setupStep2();
+
+            } catch(error) {
+                Swal.fire('ত্রুটি', 'একাউন্ট তৈরি করা যায়নি।', 'error');
+            }
+            btn.innerHTML = '<i class="fas fa-user-plus"></i> একাউন্ট খুলুন ও জমা দিন'; btn.disabled = false;
+        }
+        // ফাইনাল সাবমিশন (সরাসরি Approved হিসেবে)
+        window.submitManualDonation = async function() {
+            const amount = parseInt(document.getElementById('manualAmount').value);
+            
+            if (isNaN(amount) || amount <= 0) {
+                Swal.fire('সতর্কতা!', 'সঠিক টাকার পরিমাণ দিন।', 'warning'); return;
+            }
+
+            const btn = document.getElementById('btnSubmitManual');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> জমা হচ্ছে...'; btn.disabled = true;
+
+            try {
+                // ১. অনুদান ডাটাবেসে সেভ করা (সরাসরি approved)
+                const donationData = {
+                    name: currentManualUser.name,
+                    mobile: currentManualUser.mobile,
+                    photo: currentManualUser.photo,
+                    amount: amount,
+                    method: "ক্যাশ",
+                    trxId: "অ্যাডমিন এন্ট্রি (অফলাইন)",
+                    timestamp: new Date(),
+                    status: "approved", // সরাসরি লিস্টে চলে যাবে
+                    isTargetDonation: window.activeTargetInfo ? true : false,
+                    targetSessionId: window.activeTargetInfo ? window.activeTargetInfo.sessionId : null,
+                    targetName: window.activeTargetInfo ? window.activeTargetInfo.reason : "সাধারণ অনুদান"
+                };
+                await addDoc(collection(db, "donations"), donationData);
+
+                // ২. ইউজারের মোট টাকা আপডেট
+await updateDoc(doc(db, "users", currentManualUser.mobile), {
+    totalAmount: increment(amount),
+    totalCount: increment(1)   // <--- এই নতুন লাইনটি যোগ করুন
+});
+
+                // ৩. মূল ফান্ডের টাকা আপডেট
+                const settingsRef = doc(db, "settings", "general_settings");
+                let settingsUpdate = { totalFund: increment(amount) };
+                if (window.activeTargetInfo) {
+                    settingsUpdate.targetFund = increment(amount);
+                }
+                await updateDoc(settingsRef, settingsUpdate);
+
+                Swal.fire('আলহামদুলিল্লাহ!', 'ক্যাশ অনুদান সফলভাবে মূল লিস্টে যুক্ত হয়েছে।', 'success').then(() => {
+                    closeManualModal();
+                });
+
+            } catch(error) {
+                Swal.fire('ত্রুটি', 'টাকা জমা দেওয়া যায়নি।', 'error');
+            }
+            btn.innerHTML = '<i class="fas fa-check-circle"></i> জমা দিন'; btn.disabled = false;
+        }
+        // ==========================================
+        // নাম অথবা মোবাইল নাম্বার দিয়ে ইউজার সার্চ
+        // ==========================================
+        window.lastSearchTerm = '';
+
+        window.searchUserAdmin = async function() {
+            const inputVal = document.getElementById('searchUserInput').value.trim();
+            
+            if(!inputVal) {
+                Swal.fire('সতর্কতা', 'খোঁজার জন্য নাম অথবা মোবাইল নাম্বার দিন।', 'warning');
+                return;
+            }
+
+            Swal.fire({ title: 'খোঁজা হচ্ছে...', didOpen: () => Swal.showLoading() });
+
+            // নাম্বার কিনা সেটা চেক করার লজিক
+            const bdToEngNum = str => str.replace(/[০-৯]/g, w => '০১২৩৪৫৬৭৮৯'.indexOf(w));
+            const engInput = bdToEngNum(inputVal);
+            const isPhoneNumber = /^[0-9]+$/.test(engInput); // যদি শুধু নাম্বার হয়
+
+            try {
+                window.allUsersData = [];
+
+                if (isPhoneNumber) {
+                    // --- মোবাইল নাম্বার দিয়ে খোঁজা (মাত্র ১টি Read) ---
+                    let mobile = engInput.replace(/\D/g, ''); 
+                    if(mobile.startsWith('88')) mobile = mobile.slice(2);
+                    
+                    const docSnap = await getDoc(doc(db, "users", mobile));
+                    if (docSnap.exists()) window.allUsersData.push(docSnap.data());
+                    
+                } else {
+                    // --- নাম দিয়ে খোঁজা (Keywords Array দিয়ে) ---
+                    const searchWord = inputVal.toLowerCase(); // ছোট হাতের অক্ষরে খোঁজা হবে
+                    
+                    const q = query(
+                        collection(db, "users"), 
+                        where("keywords", "array-contains", searchWord), 
+                        limit(20) // সর্বোচ্চ ২০ জনকে আনবে
+                    );
+                    const querySnapshot = await getDocs(q);
+                    
+                    querySnapshot.forEach((doc) => {
+                        window.allUsersData.push(doc.data());
+                    });
+                }
+
+                if (window.allUsersData.length > 0) {
+                    window.lastSearchTerm = inputVal;
+                    window.renderTable();
+                    Swal.close();
+                } else {
+                    Swal.fire('পাওয়া যায়নি!', 'এই তথ্যের কোনো ইউজার পাওয়া যায়নি।', 'info');
+                }
+            } catch (error) {
+                console.error(error);
+                Swal.fire('ত্রুটি', 'খুঁজতে সমস্যা হয়েছে।', 'error');
+            }
+        }
+
+        // সার্চ ক্লিয়ার করে আবার টপ ৫০ জনকে ফিরিয়ে আনা
+        window.clearUserSearch = function() {
+            window.lastSearchTerm = '';
+            document.getElementById('searchUserInput').value = '';
+            window.allUsersData = []; // ডাটা ক্লিয়ার করে দিলাম
+            setFilter('users'); // আবার প্রথম থেকে টপ ৫০ জনকে লোড করবে
+        }
+        // ========================================================
+        // খরচের লজিক (Expense Management)
+        // ========================================================
+        window.openExpenseModal = function() {
+            document.getElementById('expenseReason').value = '';
+            document.getElementById('expenseAmount').value = '';
+            document.getElementById('expenseModal').classList.remove('hidden');
+        }
+        window.closeExpenseModal = function() {
+            document.getElementById('expenseModal').classList.add('hidden');
+        }
+
+        // খরচ সেভ করা
+        window.submitExpense = async function() {
+            const reason = document.getElementById('expenseReason').value.trim();
+            const amount = parseInt(document.getElementById('expenseAmount').value);
+
+            if(!reason || isNaN(amount) || amount <= 0) {
+                Swal.fire('সতর্কতা', 'সঠিক বিবরণ এবং টাকার পরিমাণ দিন।', 'warning'); return;
+            }
+
+            const btn = document.getElementById('btnSubmitExpense');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> সেভ হচ্ছে...'; btn.disabled = true;
+
+            try {
+                // ১. expenses কালেকশনে যোগ করা
+                await addDoc(collection(db, "expenses"), {
+                    reason: reason,
+                    amount: amount,
+                    timestamp: new Date()
+                });
+
+                // ২. সেটিংসে মোট খরচ আপডেট করা
+                await updateDoc(doc(db, "settings", "general_settings"), {
+                    totalExpense: increment(amount)
+                });
+
+                Swal.fire('সফল', 'খরচ সফলভাবে যুক্ত হয়েছে।', 'success');
+                closeExpenseModal();
+                if(window.currentFilter === 'expenses') setFilter('expenses'); // টেবিল রিফ্রেশ
+
+            } catch(error) {
+                Swal.fire('ত্রুটি', 'খরচ যুক্ত করা যায়নি।', 'error');
+            }
+            btn.innerHTML = '<i class="fas fa-check-circle"></i> খরচ সেভ করুন'; btn.disabled = false;
+        }
+
+        // খরচ ডিলিট করা
+        window.deleteExpense = function(id, amount) {
+            Swal.fire({
+                title: 'খরচটি ডিলিট করবেন?',
+                text: "ডিলিট করলে ব্যালেন্স আবার আগের জায়গায় ফিরে যাবে।",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                confirmButtonText: 'হ্যাঁ, মুছুন',
+                cancelButtonText: 'বাতিল'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try {
+                        // ১. মুছে ফেলা
+                        await deleteDoc(doc(db, "expenses", id));
+                        // ২. সেটিংস থেকে খরচ কমানো (যাতে ব্যালেন্স বাড়ে)
+                        await updateDoc(doc(db, "settings", "general_settings"), {
+                            totalExpense: increment(-amount)
+                        });
+                        Swal.fire('মোছা হয়েছে!', '', 'success');
+                        setFilter('expenses'); // রিফ্রেশ
+                    } catch(error) {
+                        Swal.fire('ত্রুটি', 'মুছতে সমস্যা হয়েছে।', 'error');
+                    }
+                }
+            });
+        }
     </script>
 </body>
 </html>
