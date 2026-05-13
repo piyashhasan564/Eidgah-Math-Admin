@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="bn">
 <head>
@@ -47,7 +46,7 @@
         <nav class="bg-emerald-700 text-white shadow-lg">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
                 <div class="text-xl font-bold flex items-center gap-2">
-                    <i class="fas fa-mosque"></i> ঈদগাহ ফান্ড ড্যাশবোর্ড
+                    <i class="fas fa-mosque"></i> ঈদগাহ ফান্ড এডমিন ড্যাশবোর্ড
                 </div>
                 <!-- বাটন গ্রুপ -->
                 <div class="flex items-center gap-3">
@@ -140,7 +139,7 @@
         <div id="manualStep1">
             <label class="block text-sm font-bold text-gray-700 mb-2">ডোনারের মোবাইল নম্বর দিন</label>
             <div class="flex gap-2">
-                <input type="tel" id="manualSearchMobile" class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-emerald-500 font-bold text-lg tracking-wider" placeholder="01XXXXXXXXX" onkeypress="if(event.key === 'Enter') checkManualMobile()">
+                <input type="text" id="manualSearchMobile" class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-emerald-500 font-bold text-lg tracking-wider" placeholder="01XXXXXXXXX" onkeypress="if(event.key === 'Enter') checkManualMobile()">
                 <button onclick="checkManualMobile()" id="btnCheckMobile" class="bg-gray-800 hover:bg-gray-900 text-white px-5 rounded-lg font-bold transition shrink-0">
                     <i class="fas fa-search"></i> খুঁজুন
                 </button>
@@ -338,7 +337,7 @@
     <!-- Firebase & Logic Scripts -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getFirestore, collection, onSnapshot, query, orderBy, doc, updateDoc, deleteDoc, setDoc, getDocs, where, getDoc, increment, limit, getCountFromServer } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+import { getFirestore, collection, onSnapshot, query, orderBy, doc, updateDoc, deleteDoc, setDoc, getDocs, where, getDoc, increment, limit, getCountFromServer, addDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         // ==========================================
         // আপনার ফায়ারবেস Config
@@ -377,12 +376,17 @@ const firebaseConfig = {
                 pendingReq++;
             });
 
-            // JavaScript দিয়ে সময় অনুযায়ী সাজানো (যাতে ফায়ারবেস ইনডেক্স এরর না দেয়)
-            window.allDonations.sort((a, b) => {
-                const timeA = a.timestamp ? a.timestamp.toMillis() : 0;
-                const timeB = b.timestamp ? b.timestamp.toMillis() : 0;
-                return timeB - timeA;
-            });
+            // JavaScript দিয়ে সময় অনুযায়ী সাজানো (Crash-Proof)
+window.allDonations.sort((a, b) => {
+    const getTime = (t) => {
+        if (!t) return 0;
+        if (typeof t.toMillis === 'function') return t.toMillis();
+        if (t.seconds) return t.seconds * 1000;
+        if (t instanceof Date) return t.getTime();
+        return new Date(t).getTime() || 0;
+    };
+    return getTime(b.timestamp) - getTime(a.timestamp);
+});
 
             document.getElementById('pendingCount').innerText = pendingReq;
             
@@ -594,10 +598,15 @@ else if (window.currentFilter === 'users') {
                 <div class="text-[9px] sm:text-[11px] text-gray-500 font-semibold bg-gray-100 inline-block px-1.5 py-0.5 sm:px-2 rounded-full">${totalCnt} বার অনুদান</div>
             </td>
             <td class="px-2 py-3 sm:p-4 border-b text-center align-middle">
-                <button onclick="viewUserHistory('${u.mobile}')" class="${isZero ? 'opacity-50 cursor-not-allowed bg-gray-100 border-gray-200 text-gray-400' : 'bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-600'} px-2 py-1 sm:px-3 sm:py-1.5 rounded shadow-sm text-[10px] sm:text-sm font-semibold transition flex items-center justify-center mx-auto gap-1" ${isZero ? 'disabled' : ''}>
-                    <i class="fas fa-history"></i> <span class="hidden sm:inline">হিস্ট্রি</span>
-                </button>
-            </td>
+    <div class="flex items-center justify-center gap-2 mt-1 sm:mt-0">
+        <button onclick="viewUserHistory('${u.mobile}')" class="${isZero ? 'opacity-50 cursor-not-allowed bg-gray-100 border-gray-200 text-gray-400' : 'bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-600'} w-7 h-7 sm:w-8 sm:h-8 rounded shadow-sm text-xs sm:text-sm font-semibold transition flex items-center justify-center" ${isZero ? 'disabled' : ''} title="হিস্ট্রি দেখুন">
+            <i class="fas fa-history"></i>
+        </button>
+        <button onclick="editUserProfile('${u.mobile}')" class="bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-600 w-7 h-7 sm:w-8 sm:h-8 rounded shadow-sm text-xs sm:text-sm font-semibold transition flex items-center justify-center" title="প্রোফাইল এডিট করুন">
+            <i class="fas fa-user-edit"></i>
+        </button>
+    </div>
+</td>
         `;
         tbody.appendChild(tr);
     });
@@ -750,7 +759,10 @@ else if (window.currentFilter === 'users') {
                 }
 
                 // সময় অনুযায়ী সাজানো (নতুনটা উপরে)
-                historyData.sort((a, b) => b.timestamp.toMillis() - a.timestamp.toMillis());
+historyData.sort((a, b) => {
+    const getT = (t) => (t && typeof t.toMillis === 'function') ? t.toMillis() : 0;
+    return getT(b.timestamp) - getT(a.timestamp);
+});
 
                 const userName = historyData[0].name; // ইউজারের নাম
 
@@ -758,10 +770,13 @@ else if (window.currentFilter === 'users') {
                 historyData.forEach(d => {
                     const dateObj = d.timestamp?.toDate ? d.timestamp.toDate() : new Date();
                     const dateStr = dateObj.toLocaleDateString('en-GB');
-                    const deleteBtn = `<button onclick="deleteData('${d.id}')" class="text-red-500 hover:text-red-700 ml-2" title="ডিলিট করুন"><i class="fas fa-trash"></i></button>`;
-                    const targetBadge = d.isTargetDonation ? `<span class="bg-amber-100 text-amber-700 text-[9px] px-1.5 py-0.5 rounded-full ml-1 align-middle" title="লক্ষ্যমাত্রায় জমা হয়েছে">Target</span>` : '';
+                    // সুন্দর ডিজাইনের এডিট ও ডিলিট বাটন
+const editBtn = `<button onclick="editTransaction('${d.id}')" class="bg-amber-50 hover:bg-amber-100 text-amber-600 border border-amber-200 w-6 h-6 sm:w-7 sm:h-7 rounded flex items-center justify-center transition shadow-sm" title="এডিট করুন"><i class="fas fa-edit text-[10px] sm:text-xs"></i></button>`;
+const deleteBtn = `<button onclick="deleteData('${d.id}')" class="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 w-6 h-6 sm:w-7 sm:h-7 rounded flex items-center justify-center transition shadow-sm" title="ডিলিট করুন"><i class="fas fa-trash text-[10px] sm:text-xs"></i></button>`;
 
-                    // TrxID এর আগে "TrxID:" লেখা বসানোর লজিক
+const targetBadge = d.isTargetDonation ? `<span class="bg-amber-100 text-amber-700 text-[9px] px-1.5 py-0.5 rounded-full ml-1 align-middle" title="লক্ষ্যমাত্রায় জমা হয়েছে">Target</span>` : '';
+
+// TrxID এর আগে "TrxID:" লেখা বসানোর লজিক
 let trxText = d.trxId;
 if (d.method !== 'ক্যাশ' && !d.trxId.includes('অফলাইন')) {
     trxText = `<span class="font-bold text-gray-500">TrxID:</span> ${d.trxId}`;
@@ -774,9 +789,12 @@ tableRows += `
             <span class="font-bold text-gray-700">${d.method}</span> ${targetBadge}<br>
             <span class="text-[10px] text-gray-400 break-all">${trxText}</span>
         </td>
-        <td class="py-3 px-2 text-right font-bold text-emerald-600 whitespace-nowrap">
-            ৳${d.amount.toLocaleString('en-IN')}
-            ${deleteBtn}
+        <td class="py-3 px-2 text-right whitespace-nowrap align-middle">
+            <div class="flex items-center justify-end gap-1.5 sm:gap-2">
+                <span class="font-bold text-emerald-600 text-sm sm:text-base mr-1">৳${d.amount.toLocaleString('en-IN')}</span>
+                ${editBtn}
+                ${deleteBtn}
+            </div>
         </td>
     </tr>
 `;
@@ -934,6 +952,200 @@ if(donationData.mobile) {
                 }
             });
         }
+
+window.editTransaction = async function(donationId) {
+    Swal.fire({ title: 'লোড হচ্ছে...', didOpen: () => Swal.showLoading() });
+    
+    // ১. ডাটাবেস থেকে বর্তমান ডাটা আনা
+    const docRef = doc(db, "donations", donationId);
+    const docSnap = await getDoc(docRef);
+    if (!docSnap.exists()) return;
+    const d = docSnap.data();
+
+    Swal.close();
+
+    // ২. এডিট ফর্ম (পপ-আপ)
+    const { value: formValues } = await Swal.fire({
+        title: 'ট্রানজেকশন এডিট',
+        html: `
+            <div class="text-left mb-2 text-sm font-bold">মাধ্যম:</div>
+            <select id="edit-method" class="w-full p-2 border rounded mb-3">
+                <option value="বিকাশ" ${d.method==='বিকাশ'?'selected':''}>বিকাশ</option>
+                <option value="নগদ" ${d.method==='নগদ'?'selected':''}>নগদ</option>
+                <option value="রকেট" ${d.method==='রকেট'?'selected':''}>রকেট</option>
+                <option value="ক্যাশ" ${d.method==='ক্যাশ'?'selected':''}>ক্যাশ</option>
+            </select>
+
+            <div class="text-left mb-2 text-sm font-bold">TrxID / বিবরণ:</div>
+            <input id="edit-trx" class="w-full p-2 border rounded mb-3 font-mono" value="${d.trxId || ''}">
+
+            <div class="text-left mb-2 text-sm font-bold">পরিমাণ (৳):</div>
+            <input id="edit-amount" type="number" class="w-full p-2 border rounded font-bold text-lg text-emerald-600" value="${d.amount}">
+        `,
+        showCancelButton: true,
+        confirmButtonText: 'আপডেট করুন',
+        preConfirm: () => {
+            return {
+                method: document.getElementById('edit-method').value,
+                trxId: document.getElementById('edit-trx').value,
+                amount: Number(document.getElementById('edit-amount').value)
+            }
+        }
+    });
+
+    if (formValues) {
+        Swal.fire({ title: 'আপডেট হচ্ছে...', didOpen: () => Swal.showLoading() });
+
+        try {
+            const oldAmount = d.amount;
+            const newAmount = formValues.amount;
+            const amountDiff = newAmount - oldAmount; // পার্থক্য বের করা
+
+            // ডাটাবেসে ডোনেশন হিস্ট্রি আপডেট
+            await updateDoc(docRef, {
+                method: formValues.method,
+                trxId: formValues.trxId,
+                amount: newAmount
+            });
+
+            // যদি স্ট্যাটাস approved হয়, তবে ব্যালেন্স আপডেট করতে হবে
+            if (d.status === "approved" && amountDiff !== 0) {
+                // ১. ইউজারের মোট ব্যালেন্স আপডেট
+                if(d.mobile) {
+                    await updateDoc(doc(db, "users", d.mobile), { totalAmount: increment(amountDiff) });
+                }
+
+                // ২. মূল ফান্ডের (Settings) ব্যালেন্স আপডেট
+                const settingsRef = doc(db, "settings", "general_settings");
+                let settingsUpdate = { totalFund: increment(amountDiff) };
+                
+                // যদি টার্গেট ডোনেশন হয় তবে টার্গেট ফান্ডেও আপডেট
+                if (d.isTargetDonation && d.targetSessionId) {
+                    settingsUpdate.targetFund = increment(amountDiff);
+                }
+                await updateDoc(settingsRef, settingsUpdate);
+            }
+
+            Swal.fire('সফল!', 'তথ্য আপডেট করা হয়েছে।', 'success').then(() => {
+                if(window.currentFilter === 'users') setFilter('users'); // লিস্ট রিফ্রেশ
+                Swal.close(); 
+            });
+
+        } catch (error) {
+            Swal.fire('ত্রুটি', 'আপডেট করা যায়নি।', 'error');
+        }
+    }
+}
+window.editUserProfile = async function(oldMobile) {
+    Swal.fire({ title: 'তথ্য আনা হচ্ছে...', didOpen: () => Swal.showLoading() });
+
+    const docSnap = await getDoc(doc(db, "users", oldMobile));
+    if (!docSnap.exists()) return;
+    const u = docSnap.data();
+    Swal.close();
+
+    const { value: formValues } = await Swal.fire({
+        title: 'ইউজার প্রোফাইল এডিট',
+        html: `
+            <div class="text-left mb-2 text-sm font-bold">নাম:</div>
+            <input id="edit-name" class="w-full p-2 border rounded mb-3" value="${u.name}">
+
+            <div class="text-left mb-2 text-sm font-bold">মোবাইল নাম্বার:</div>
+            <input id="edit-mobile" class="w-full p-2 border rounded mb-3 font-mono" value="${u.mobile}">
+            
+            <div class="text-left mb-2 text-xs font-bold text-red-500">* নতুন ছবি দিতে চাইলে ফাইল নির্বাচন করুন:</div>
+            <input id="edit-photo" type="file" accept="image/*" class="w-full p-1 border rounded text-sm">
+        `,
+        showCancelButton: true,
+        confirmButtonText: 'আপডেট করুন',
+        preConfirm: () => {
+            const num = document.getElementById('edit-mobile').value.trim();
+            if(num.length !== 11 || !num.startsWith('01')) {
+                Swal.showValidationMessage('সঠিক ১১ ডিজিটের মোবাইল নাম্বার দিন'); return false;
+            }
+            return {
+                name: document.getElementById('edit-name').value,
+                mobile: num,
+                file: document.getElementById('edit-photo').files[0]
+            }
+        }
+    });
+
+    if (formValues) {
+        Swal.fire({ title: 'আপডেট হচ্ছে...', allowOutsideClick:false, didOpen: () => Swal.showLoading() });
+
+        try {
+            let finalPhotoUrl = u.photo;
+
+            // ১. যদি নতুন ছবি দেয়, তবে ইমেজেবিবি তে আপলোড করা
+            if (formValues.file) {
+                const compressedBlob = await compressImage(formValues.file);
+                const formData = new FormData();
+                formData.append('image', compressedBlob, 'avatar.jpg');
+                const imgbbResponse = await fetch(`https://api.imgbb.com/1/upload?key=2c15582c6548f043b824081421986562`, { method: 'POST', body: formData });
+                const imgData = await imgbbResponse.json();
+                finalPhotoUrl = imgData.data.url;
+            }
+
+            const newKeywords = formValues.name.toLowerCase().split(" ");
+            const newMobile = formValues.mobile;
+
+            // ২. নাম্বার কি পরিবর্তন হয়েছে?
+            if (newMobile !== oldMobile) {
+                // নতুন নাম্বারে কোনো একাউন্ট আছে কি না চেক করা
+                const checkExist = await getDoc(doc(db, "users", newMobile));
+                if (checkExist.exists()) {
+                    Swal.fire('ত্রুটি', 'এই নতুন নাম্বারটি দিয়ে ইতোমধ্যে একটি একাউন্ট খোলা আছে!', 'error');
+                    return;
+                }
+
+                // নতুন নাম্বারে ডাটা সেভ করা
+                const newUserData = { ...u, name: formValues.name, mobile: newMobile, photo: finalPhotoUrl, keywords: newKeywords };
+                await setDoc(doc(db, "users", newMobile), newUserData);
+
+                // পুরোনো নাম্বারের সব ডোনেশন হিস্ট্রির নাম্বার আপডেট করা (Batch Update)
+                const q = query(collection(db, "donations"), where("mobile", "==", oldMobile));
+                const snap = await getDocs(q);
+                snap.forEach(async (dDoc) => {
+                    await updateDoc(doc(db, "donations", dDoc.id), { 
+                        mobile: newMobile, 
+                        name: formValues.name, 
+                        photo: finalPhotoUrl 
+                    });
+                });
+
+                // পুরোনো নাম্বার ডিলিট করা
+                await deleteDoc(doc(db, "users", oldMobile));
+
+            } else {
+                // নাম্বার পরিবর্তন হয়নি, শুধু নাম ও ছবি আপডেট
+                await updateDoc(doc(db, "users", oldMobile), {
+                    name: formValues.name,
+                    photo: finalPhotoUrl,
+                    keywords: newKeywords
+                });
+
+                // হিস্ট্রিতে নাম ও ছবি আপডেট
+                const q = query(collection(db, "donations"), where("mobile", "==", oldMobile));
+                const snap = await getDocs(q);
+                snap.forEach(async (dDoc) => {
+                    await updateDoc(doc(db, "donations", dDoc.id), { 
+                        name: formValues.name, 
+                        photo: finalPhotoUrl 
+                    });
+                });
+            }
+
+            Swal.fire('সফল!', 'প্রোফাইল আপডেট হয়েছে।', 'success').then(() => {
+                setFilter('users'); // লিস্ট রিফ্রেশ
+            });
+
+        } catch(error) {
+            console.error(error);
+            Swal.fire('ত্রুটি', 'প্রোফাইল আপডেট করতে সমস্যা হয়েছে।', 'error');
+        }
+    }
+}
 
         window.setFilter = async function(type) {
     window.currentFilter = type;
@@ -1373,13 +1585,24 @@ window.viewTargetDetails = async function(sessionId, reason, targetAmount) {
             });
         }
 // ==========================================
-        // ম্যানুয়াল ডোনেশন সিস্টেম (অফলাইন ক্যাশ জমা)
-        // ==========================================
-        import { addDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        
 
-        // নাম্বার ইংরেজিতে করার ফাংশন
+        // ==========================================
+        // স্মার্ট নাম্বার ফিল্টার ফাংশন (Smart Mobile Filter)
+        // ==========================================
         const bdToEngNum = str => str.replace(/[০-৯]/g, w => '০১২৩৪৫৬৭৮৯'.indexOf(w));
-        const formatMobile = num => { let n = bdToEngNum(num).replace(/\D/g, ''); if(n.startsWith('88')) n = n.slice(2); return n; };
+        
+        const formatMobile = num => { 
+            let n = bdToEngNum(num).replace(/\D/g, ''); // সব অক্ষর ও স্পেস মুছে শুধু সংখ্যা নেবে
+            let matchIdx = n.indexOf('01'); // '01' খুঁজবে
+            
+            if(matchIdx !== -1) {
+                return n.slice(matchIdx, matchIdx + 11); // '01' থেকে শুরু করে ১১ ডিজিট নেবে
+            } else if (n.startsWith('88')) {
+                return n.slice(2, 13); // '88' দিয়ে শুরু হলে পরের ১১ ডিজিট নেবে
+            }
+            return n.slice(0, 11);
+        };
 
         let currentManualUser = null;
 
@@ -1402,13 +1625,18 @@ window.viewTargetDetails = async function(sessionId, reason, targetAmount) {
             const rawMobile = document.getElementById('manualSearchMobile').value;
             const mobile = formatMobile(rawMobile);
 
+            // ম্যাজিক: খোঁজার আগে বক্সে থাকা সব নাম ও টেক্সট মুছে শুধু ফ্রেশ নাম্বারটি বসিয়ে দেবে!
+            document.getElementById('manualSearchMobile').value = mobile;
+
+            // যদি নাম্বার ১১ ডিজিটের না হয় বা '01' দিয়ে শুরু না হয়
             if(mobile.length !== 11 || !mobile.startsWith('01')) {
                 Swal.fire('ভুল নাম্বার', 'সঠিক ১১ ডিজিটের মোবাইল নাম্বার দিন।', 'warning');
                 return;
             }
 
             const btn = document.getElementById('btnCheckMobile');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; 
+            btn.disabled = true;
 
             try {
                 const docSnap = await getDoc(doc(db, "users", mobile));
@@ -1439,7 +1667,9 @@ window.viewTargetDetails = async function(sessionId, reason, targetAmount) {
             } catch(error) {
                 Swal.fire('ত্রুটি', 'সার্ভার চেক করতে সমস্যা হয়েছে।', 'error');
             }
-            btn.innerHTML = '<i class="fas fa-search"></i> খুঁজুন'; btn.disabled = false;
+            
+            btn.innerHTML = '<i class="fas fa-search"></i> খুঁজুন'; 
+            btn.disabled = false;
         }
 
         // স্টেপ ২: ডাটা বসানো এবং টার্গেট চেক করা
