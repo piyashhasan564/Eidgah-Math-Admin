@@ -17,7 +17,8 @@
 
     <!-- SheetJS (Excel Download) -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
-
+<!-- Html2Canvas (Image Download) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         body { font-family: 'Hind Siliguri', sans-serif; background-color: #f3f4f6; }
         .hidden { display: none !important; }
@@ -42,88 +43,134 @@
     <!-- ================= মূল ড্যাশবোর্ড ================= -->
     <div id="dashboardScreen" class="hidden min-h-screen">
         
-        <!-- টপ নেভিগেশন -->
-        <nav class="bg-emerald-700 text-white shadow-lg">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-                <div class="text-xl font-bold flex items-center gap-2">
-                    <i class="fas fa-mosque"></i> ঈদগাহ ফান্ড এডমিন ড্যাশবোর্ড
-                </div>
-                <!-- বাটন গ্রুপ -->
-                <div class="flex items-center gap-3">
+        <!-- টপ নেভিগেশন (Premium Design) -->
+        <nav class="bg-gradient-to-r from-emerald-800 via-emerald-700 to-teal-800 text-white shadow-xl sticky top-0 z-40 border-b border-emerald-500/30">
+            <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3 flex justify-between items-center">
                 
-                    <button onclick="openSettings()" class="bg-blue-500 hover:bg-blue-600 px-2 py-1 rounded-lg text-sm font-semibold flex items-center gap-2 transition shadow-md" title="সেটিংস">
-                        <i class="fas fa-cog text-lg"></i>
+                <!-- লোগো এবং টাইটেল -->
+                <div class="flex items-center gap-2 sm:gap-3">
+                    <div class="bg-white/10 p-2 sm:p-2.5 rounded-lg shadow-inner border border-white/10 backdrop-blur-sm">
+                        <i class="fas fa-mosque text-lg sm:text-xl text-emerald-100"></i>
+                    </div>
+                    <div class="leading-tight">
+                        <h1 class="text-[16px] sm:text-xl font-bold tracking-wide text-white drop-shadow-md">
+                            ঈদগাহ ফান্ড
+                        </h1>
+                        <p class="text-[10px] sm:text-xs text-emerald-200 font-medium tracking-wider mt-0.5">অ্যাডমিন ড্যাশবোর্ড</p>
+                    </div>
+                </div>
+
+                <!-- বাটন গ্রুপ (Glass Effect) -->
+                <div class="flex items-center gap-1.5 sm:gap-3">
+                    <button onclick="openSettings()" class="bg-white/10 hover:bg-white/20 border border-white/10 text-white w-9 h-9 sm:w-auto sm:px-4 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 transition-all shadow-sm backdrop-blur-md" title="সেটিংস">
+                        <i class="fas fa-cog text-sm sm:text-base"></i> <span class="hidden sm:inline">সেটিংস</span>
                     </button>
-                    <button onclick="openManualModal()" class="bg-amber-500 hover:bg-amber-600 px-3 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition shadow-md text-white" title="ম্যানুয়াল জমা">
-    <i class="fas fa-plus-circle"></i> <span class="hidden sm:inline">অফলাইন জমা</span>
-</button>
-<button onclick="openExpenseModal()" class="bg-red-500 hover:bg-red-600 px-3 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition shadow-md text-white" title="খরচ যুক্ত করুন">
-                        <i class="fas fa-minus-circle"></i> <span class="hidden sm:inline">খরচ এন্ট্রি</span>
+                    
+                    <button onclick="openManualModal()" class="bg-emerald-400/20 hover:bg-emerald-400/40 border border-emerald-300/20 text-white w-9 h-9 sm:w-auto sm:px-4 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 transition-all shadow-sm backdrop-blur-md" title="ম্যানুয়াল জমা">
+                        <i class="fas fa-plus text-sm sm:text-base"></i> <span class="hidden sm:inline">জমা</span>
                     </button>
-                    <button onclick="logout()" class="bg-red-500 hover:bg-red-600 px-3 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition shadow-md">
-                        <i class="fas fa-sign-out-alt"></i> <span class="hidden sm:inline">লগআউট</span>
+                    
+                    <button onclick="openExpenseModal()" class="bg-orange-400/20 hover:bg-orange-400/40 border border-orange-300/20 text-white w-9 h-9 sm:w-auto sm:px-4 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 transition-all shadow-sm backdrop-blur-md" title="খরচ যুক্ত করুন">
+                        <i class="fas fa-minus text-sm sm:text-base"></i> <span class="hidden sm:inline">খরচ</span>
+                    </button>
+                    
+                    <button onclick="logout()" class="bg-red-500/30 hover:bg-red-500/60 border border-red-400/20 text-white w-9 h-9 sm:w-auto sm:px-4 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 transition-all shadow-sm backdrop-blur-md" title="লগআউট">
+                        <i class="fas fa-power-off text-sm sm:text-base"></i> <span class="hidden sm:inline">লগআউট</span>
                     </button>
                 </div>
+                
             </div>
         </nav>
 
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             
-            <!-- স্ট্যাটাস কার্ডস -->
-            <div class="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8">
+            <!-- স্ট্যাটাস কার্ডস (Premium Modern Design) -->
+            <div class="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 mb-8">
+                
                 <!-- মোট সংগ্রহ -->
-                <div class="bg-white rounded-xl shadow-sm p-4 sm:p-6 border-l-4 border-emerald-500 flex flex-col sm:flex-row items-start sm:items-center justify-between">
-                    <div>
-                        <p class="text-gray-500 text-xs sm:text-sm font-medium">মোট সংগ্রহ</p>
-                        <h3 class="text-xl sm:text-3xl font-bold text-gray-800 mt-1" id="totalRaised">৳০</h3>
+                <div class="relative bg-white rounded-2xl p-4 sm:p-6 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] hover:-translate-y-1 hover:shadow-xl transition-all duration-300 overflow-hidden group border border-gray-50">
+                    <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-gradient-to-br from-emerald-100 to-emerald-50 rounded-full opacity-50 group-hover:scale-150 transition-transform duration-700 pointer-events-none"></div>
+                    <div class="relative flex justify-between items-start">
+                        <div class="pr-2">
+                            <p class="text-gray-500 text-[11px] sm:text-sm font-semibold mb-1">মোট সংগ্রহ</p>
+                            <h3 class="text-xl sm:text-3xl font-extrabold text-gray-800 tracking-tight" id="totalRaised">৳০</h3>
+                        </div>
+                        <div class="w-9 h-9 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-white shadow-lg shadow-emerald-500/30 shrink-0">
+                            <i class="fas fa-hand-holding-usd text-sm sm:text-xl"></i>
+                        </div>
                     </div>
-                    <div class="hidden sm:flex w-10 h-10 sm:w-12 sm:h-12 bg-emerald-100 rounded-full items-center justify-center text-emerald-600 text-lg sm:text-2xl mt-2 sm:mt-0"><i class="fas fa-hand-holding-usd"></i></div>
                 </div>
 
                 <!-- মোট খরচ -->
-                <div class="bg-white rounded-xl shadow-sm p-4 sm:p-6 border-l-4 border-red-500 flex flex-col sm:flex-row items-start sm:items-center justify-between">
-                    <div>
-                        <p class="text-gray-500 text-xs sm:text-sm font-medium">মোট খরচ</p>
-                        <h3 class="text-xl sm:text-3xl font-bold text-red-600 mt-1" id="totalExpenseShow">৳০</h3>
+                <div class="relative bg-white rounded-2xl p-4 sm:p-6 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] hover:-translate-y-1 hover:shadow-xl transition-all duration-300 overflow-hidden group border border-gray-50">
+                    <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-gradient-to-br from-red-100 to-red-50 rounded-full opacity-50 group-hover:scale-150 transition-transform duration-700 pointer-events-none"></div>
+                    <div class="relative flex justify-between items-start">
+                        <div class="pr-2">
+                            <p class="text-gray-500 text-[11px] sm:text-sm font-semibold mb-1">মোট খরচ</p>
+                            <h3 class="text-xl sm:text-3xl font-extrabold text-red-600 tracking-tight" id="totalExpenseShow">৳০</h3>
+                        </div>
+                        <div class="w-9 h-9 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-red-400 to-red-600 flex items-center justify-center text-white shadow-lg shadow-red-500/30 shrink-0">
+                            <i class="fas fa-file-invoice-dollar text-sm sm:text-xl"></i>
+                        </div>
                     </div>
-                    <div class="hidden sm:flex w-10 h-10 sm:w-12 sm:h-12 bg-red-100 rounded-full items-center justify-center text-red-600 text-lg sm:text-2xl mt-2 sm:mt-0"><i class="fas fa-file-invoice-dollar"></i></div>
                 </div>
 
                 <!-- বর্তমান ফান্ড (ব্যালেন্স) -->
-                <div class="bg-white rounded-xl shadow-sm p-4 sm:p-6 border-l-4 border-blue-600 flex flex-col sm:flex-row items-start sm:items-center justify-between">
-                    <div>
-                        <p class="text-gray-500 text-xs sm:text-sm font-medium">বর্তমান ফান্ড (ক্যাশে আছে)</p>
-                        <h3 class="text-xl sm:text-3xl font-bold text-blue-700 mt-1" id="currentBalanceShow">৳০</h3>
+                <div class="relative bg-white rounded-2xl p-4 sm:p-6 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] hover:-translate-y-1 hover:shadow-xl transition-all duration-300 overflow-hidden group border border-gray-50 col-span-2 lg:col-span-1">
+                    <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-gradient-to-br from-blue-100 to-blue-50 rounded-full opacity-50 group-hover:scale-150 transition-transform duration-700 pointer-events-none"></div>
+                    <div class="relative flex justify-between items-start">
+                        <div class="pr-2">
+                            <p class="text-gray-500 text-[11px] sm:text-sm font-semibold mb-1">বর্তমান ফান্ড (ক্যাশে আছে)</p>
+                            <h3 class="text-2xl sm:text-3xl font-extrabold text-blue-700 tracking-tight" id="currentBalanceShow">৳০</h3>
+                        </div>
+                        <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white shadow-lg shadow-blue-500/30 shrink-0">
+                            <i class="fas fa-wallet text-base sm:text-xl"></i>
+                        </div>
                     </div>
-                    <div class="hidden sm:flex w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-full items-center justify-center text-blue-600 text-lg sm:text-2xl mt-2 sm:mt-0"><i class="fas fa-wallet"></i></div>
                 </div>
 
                 <!-- পেন্ডিং রিকোয়েস্ট -->
-                <div class="bg-white rounded-xl shadow-sm p-4 sm:p-6 border-l-4 border-amber-500 flex flex-col sm:flex-row items-start sm:items-center justify-between">
-                    <div>
-                        <p class="text-gray-500 text-xs sm:text-sm font-medium">অপেক্ষমাণ অনুদান</p>
-                        <h3 class="text-xl sm:text-3xl font-bold text-gray-800 mt-1" id="pendingCount">০</h3>
+                <div class="relative bg-white rounded-2xl p-4 sm:p-6 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] hover:-translate-y-1 hover:shadow-xl transition-all duration-300 overflow-hidden group border border-gray-50">
+                    <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-gradient-to-br from-amber-100 to-amber-50 rounded-full opacity-50 group-hover:scale-150 transition-transform duration-700 pointer-events-none"></div>
+                    <div class="relative flex justify-between items-start">
+                        <div class="pr-2">
+                            <p class="text-gray-500 text-[11px] sm:text-sm font-semibold mb-1">অপেক্ষমাণ অনুদান</p>
+                            <h3 class="text-xl sm:text-3xl font-extrabold text-gray-800 tracking-tight" id="pendingCount">০</h3>
+                        </div>
+                        <div class="w-9 h-9 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-amber-400 to-amber-500 flex items-center justify-center text-white shadow-lg shadow-amber-500/30 shrink-0">
+                            <i class="fas fa-hourglass-half text-sm sm:text-xl"></i>
+                        </div>
                     </div>
-                    <div class="hidden sm:flex w-10 h-10 sm:w-12 sm:h-12 bg-amber-100 rounded-full items-center justify-center text-amber-600 text-lg sm:text-2xl mt-2 sm:mt-0"><i class="fas fa-hourglass-half"></i></div>
                 </div>
 
                 <!-- মোট দাতা -->
-                <div class="bg-white rounded-xl shadow-sm p-4 sm:p-6 border-l-4 border-blue-400 flex flex-col sm:flex-row items-start sm:items-center justify-between">
-                    <div>
-                        <p class="text-gray-500 text-xs sm:text-sm font-medium">মোট দাতা</p>
-                        <h3 class="text-xl sm:text-3xl font-bold text-gray-800 mt-1" id="approvedCount">০</h3>
+                <div class="relative bg-white rounded-2xl p-4 sm:p-6 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] hover:-translate-y-1 hover:shadow-xl transition-all duration-300 overflow-hidden group border border-gray-50">
+                    <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-gradient-to-br from-cyan-100 to-cyan-50 rounded-full opacity-50 group-hover:scale-150 transition-transform duration-700 pointer-events-none"></div>
+                    <div class="relative flex justify-between items-start">
+                        <div class="pr-2">
+                            <p class="text-gray-500 text-[11px] sm:text-sm font-semibold mb-1">মোট দাতা</p>
+                            <h3 class="text-xl sm:text-3xl font-extrabold text-gray-800 tracking-tight" id="approvedCount">০</h3>
+                        </div>
+                        <div class="w-9 h-9 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-cyan-400 to-cyan-600 flex items-center justify-center text-white shadow-lg shadow-cyan-500/30 shrink-0">
+                            <i class="fas fa-users text-sm sm:text-xl"></i>
+                        </div>
                     </div>
-                    <div class="hidden sm:flex w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-full items-center justify-center text-blue-500 text-lg sm:text-2xl mt-2 sm:mt-0"><i class="fas fa-users"></i></div>
                 </div>
 
                 <!-- মোট ইউজার -->
-                <div class="bg-white rounded-xl shadow-sm p-4 sm:p-6 border-l-4 border-purple-500 flex flex-col sm:flex-row items-start sm:items-center justify-between">
-                    <div>
-                        <p class="text-gray-500 text-xs sm:text-sm font-medium">রেজিস্টার্ড অ্যাকাউন্ট</p>
-                        <h3 class="text-xl sm:text-3xl font-bold text-gray-800 mt-1" id="totalUsersCount">০</h3>
+                <div class="relative bg-white rounded-2xl p-4 sm:p-6 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] hover:-translate-y-1 hover:shadow-xl transition-all duration-300 overflow-hidden group border border-gray-50 col-span-2 sm:col-span-1">
+                    <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-gradient-to-br from-purple-100 to-purple-50 rounded-full opacity-50 group-hover:scale-150 transition-transform duration-700 pointer-events-none"></div>
+                    <div class="relative flex justify-between items-start">
+                        <div class="pr-2">
+                            <p class="text-gray-500 text-[11px] sm:text-sm font-semibold mb-1">রেজিস্টার্ড অ্যাকাউন্ট</p>
+                            <h3 class="text-xl sm:text-3xl font-extrabold text-gray-800 tracking-tight" id="totalUsersCount">০</h3>
+                        </div>
+                        <div class="w-9 h-9 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-purple-500 to-purple-700 flex items-center justify-center text-white shadow-lg shadow-purple-500/30 shrink-0">
+                            <i class="fas fa-user-plus text-sm sm:text-xl"></i>
+                        </div>
                     </div>
-                    <div class="hidden sm:flex w-10 h-10 sm:w-12 sm:h-12 bg-purple-100 rounded-full items-center justify-center text-purple-600 text-lg sm:text-2xl mt-2 sm:mt-0"><i class="fas fa-user-plus"></i></div>
                 </div>
+                
             </div>
 <!-- ================= ম্যানুয়াল ডোনেশন মোডাল ================= -->
 <div id="manualDonationModal" class="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center hidden backdrop-blur-sm px-4">
@@ -221,102 +268,159 @@
         </button>
     </div>
 </div>
-            <!-- ================= সেটিংস মোডাল (পপ-আপ) ================= -->
-            <div id="settingsModal" class="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center hidden backdrop-blur-sm px-4">
-                <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-lg relative transform transition-all max-h-[90vh] overflow-y-auto">
-                    <!-- ক্লোজ বাটন -->
-                    <button onclick="closeSettings()" class="absolute top-4 right-4 text-gray-400 hover:text-red-500 transition text-2xl">
-                        <i class="fas fa-times-circle"></i>
+            <!-- ================= সেটিংস মোডাল (Premium Design) ================= -->
+<div id="settingsModal" class="fixed inset-0 bg-gray-900/60 z-50 flex items-center justify-center hidden backdrop-blur-sm px-4 sm:p-6 transition-opacity duration-300">
+    <!-- Modal Container -->
+    <div class="bg-white rounded-[24px] shadow-2xl w-full max-w-xl relative flex flex-col overflow-hidden max-h-[90vh] sm:max-h-[85vh] transform transition-all border border-gray-100">
+        
+        <!-- Sticky Premium Header -->
+        <div class="bg-white/80 backdrop-blur-md px-6 py-4 border-b border-gray-100 flex justify-between items-center sticky top-0 z-20">
+            <h3 class="text-xl sm:text-2xl font-extrabold text-gray-800 tracking-tight flex items-center gap-3">
+                <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center text-blue-600 shadow-sm border border-blue-100/50">
+                    <i class="fas fa-sliders-h text-lg sm:text-xl"></i>
+                </div>
+                সিস্টেম সেটিংস
+            </h3>
+            <button onclick="closeSettings()" class="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full bg-gray-50 hover:bg-red-50 text-gray-400 hover:text-red-500 transition-all duration-300 focus:outline-none border border-transparent hover:border-red-100">
+                <i class="fas fa-times text-lg"></i>
+            </button>
+        </div>
+        
+        <!-- Scrollable Content -->
+        <div class="p-4 sm:p-6 overflow-y-auto space-y-5 bg-gray-50/50 custom-scrollbar">
+            
+            <!-- লক্ষ্যমাত্রা ও প্রোগ্রেস বার (Toggle Card) -->
+            <div class="bg-white p-4 sm:p-5 rounded-2xl border border-gray-100 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.05)] flex justify-between items-center hover:shadow-md transition-shadow duration-300">
+                <div class="flex items-center gap-3 sm:gap-4">
+                    <div class="relative w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-emerald-50 to-emerald-100 flex items-center justify-center text-emerald-500 shrink-0 border border-emerald-200/50 shadow-inner">
+                        <i class="fas fa-bullseye text-lg"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-gray-800 text-sm sm:text-base leading-tight">লক্ষ্যমাত্রা ও প্রোগ্রেস বার</h4>
+                        <p class="text-[10px] sm:text-xs text-gray-500 mt-1">বন্ধ করলে বর্তমান টার্গেটটি হিস্ট্রিতে সেভ হবে।</p>
+                    </div>
+                </div>
+                
+                <!-- Premium Futuristic Switch -->
+                <label class="relative inline-flex items-center cursor-pointer shrink-0 group">
+                    <input type="checkbox" id="adminShowTarget" class="sr-only peer" onchange="toggleTargetProgress(this.checked)">
+                    
+                    <div class="w-14 h-7 sm:w-16 sm:h-8 bg-[#e2e8f0] rounded-full peer 
+                                shadow-[inset_0_2px_5px_rgba(0,0,0,0.15)] 
+                                transition-all duration-500 ease-in-out
+                                
+                                peer-checked:bg-gradient-to-r peer-checked:from-emerald-400 peer-checked:to-teal-500 
+                                peer-checked:shadow-[0_0_15px_rgba(16,185,129,0.4)]
+                                
+                                after:content-[''] after:absolute 
+                                after:top-[3px] sm:after:top-[4px] 
+                                after:left-[3px] sm:after:left-[4px] 
+                                after:bg-white after:rounded-full 
+                                after:h-[22px] after:w-[22px] sm:after:h-6 sm:after:w-6 
+                                after:shadow-[0_2px_6px_rgba(0,0,0,0.25)] 
+                                after:transition-all after:duration-500 
+                                
+                                peer-checked:after:translate-x-7 sm:peer-checked:after:translate-x-8
+                                group-hover:after:scale-[0.90]">
+                    </div>
+                </label>
+            </div>
+            
+            <!-- বিজ্ঞপ্তি / নোটিশ -->
+            <div class="bg-white p-4 sm:p-5 rounded-2xl border border-gray-100 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.05)] hover:shadow-md transition-shadow duration-300">
+                <label class="flex items-center gap-2 text-sm font-bold text-gray-700 mb-3">
+                    <i class="fas fa-bullhorn text-amber-500"></i> ইউজার প্যানেল নোটিশ
+                </label>
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <textarea id="adminMessage" rows="2" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500/30 focus:border-amber-400 transition-all text-sm resize-none font-medium text-gray-700 placeholder-gray-400" placeholder="যেমন: মসজিদের ছাদ ঢালাইয়ের কাজ চলছে..."></textarea>
+                    <button onclick="updateSingleSetting('message', 'adminMessage')" class="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white px-6 py-3 rounded-xl font-bold transition-all shadow-md shadow-orange-500/20 shrink-0 flex items-center justify-center gap-2 sm:h-auto">
+                        <i class="fas fa-save hidden sm:inline"></i> সেভ করুন
                     </button>
-                    
-                    <h3 class="text-xl font-bold text-gray-800 mb-6 border-b pb-3"><i class="fas fa-cogs text-blue-500 mr-2"></i> সেটিংস ও আপডেট</h3>
-                    
-                    <div class="space-y-5">
-                        <!-- ফান্ড স্ট্যাটাস শো/হাইড টগল -->
-                        <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 flex justify-between items-center">
-                            <div>
-                                <h4 class="font-bold text-gray-800 text-sm">লক্ষ্যমাত্রা ও প্রোগ্রেস বার দেখান</h4>
-                                <p class="text-xs text-gray-500">বন্ধ করলে বর্তমান লক্ষ্যমাত্রাটি 'Targets' ট্যাবে সেভ হয়ে যাবে।</p>
-                            </div>
-                            <label class="relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" id="adminShowTarget" class="sr-only peer" onchange="toggleTargetProgress(this.checked)">
-                                <div class="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
-                            </label>
-                        </div>
-                        
-                        <!-- লক্ষ্যমাত্রার মেসেজ -->
-                        <div class="bg-blue-50 p-3 rounded-lg border border-blue-100">
-                            <label class="block text-sm font-bold text-gray-700 mb-2">বিজ্ঞপ্তি বা মেসেজ (ইউজার প্যানেলে দেখাবে)</label>
-                            <div class="flex gap-2">
-                                <textarea id="adminMessage" rows="2" class="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 transition text-sm" placeholder="যেমন: মসজিদের ছাদ ঢালাইয়ের জন্য ফান্ড সংগ্রহ..."></textarea>
-                                <button onclick="updateSingleSetting('message', 'adminMessage')" class="bg-blue-600 hover:bg-blue-700 text-white px-4 rounded-lg font-bold transition flex items-center justify-center shrink-0">
-                                    সেভ
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- বিকাশ -->
-                        <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-1">বিকাশ নাম্বার</label>
-                            <div class="flex gap-2">
-                                <input type="text" id="adminBkash" class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-pink-500 transition">
-                                <button onclick="updateSingleSetting('bkash', 'adminBkash')" class="bg-pink-600 hover:bg-pink-700 text-white px-5 rounded-lg font-bold transition shrink-0">
-                                    সেভ
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- নগদ -->
-                        <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-1">নগদ নাম্বার</label>
-                            <div class="flex gap-2">
-                                <input type="text" id="adminNagad" class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-orange-500 transition">
-                                <button onclick="updateSingleSetting('nagad', 'adminNagad')" class="bg-orange-500 hover:bg-orange-600 text-white px-5 rounded-lg font-bold transition shrink-0">
-                                    সেভ
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- রকেট -->
-                        <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-1">রকেট নাম্বার</label>
-                            <div class="flex gap-2">
-                                <input type="text" id="adminRocket" class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-purple-500 transition">
-                                <button onclick="updateSingleSetting('rocket', 'adminRocket')" class="bg-purple-600 hover:bg-purple-700 text-white px-5 rounded-lg font-bold transition shrink-0">
-                                    সেভ
-                                </button>
-                            </div>
-                        </div>
-                        <!-- অ্যাডমিন পাসওয়ার্ড পরিবর্তন -->
-                        <div class="mt-4 pt-4 border-t border-gray-200">
-                            <label class="block text-sm font-bold text-red-600 mb-1"><i class="fas fa-key"></i> অ্যাডমিন পাসওয়ার্ড পরিবর্তন</label>
-                            <div class="flex gap-2">
-                                <input type="text" id="adminNewPass" class="w-full px-4 py-2 border-2 border-red-200 rounded-lg focus:outline-none focus:border-red-500 transition" placeholder="নতুন পাসওয়ার্ড দিন (ডিফল্ট: 12345)">
-                                <button onclick="updateSingleSetting('adminPassword', 'adminNewPass')" class="bg-red-600 hover:bg-red-700 text-white px-5 rounded-lg font-bold transition shrink-0">
-                                    পরিবর্তন
-                                </button>
-                            </div>
-                        </div>
-                        
-                    </div>
-                    
-                    <div class="mt-6 text-right">
-                        <button onclick="closeSettings()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-6 py-2 rounded-lg font-bold transition">বন্ধ করুন</button>
-                    </div>
                 </div>
             </div>
 
-            <!-- ডাটা টেবিল সেকশন -->
-            <div class="bg-white rounded-xl shadow-sm overflow-hidden">
-                <div class="border-b border-gray-200 bg-gray-50 p-4 flex justify-between items-center">
-                    <h3 id="tableMainTitle" class="text-lg font-bold text-gray-800"><i class="fas fa-list-alt text-emerald-600 mr-2"></i> অনুদানের তালিকা</h3>
+            <!-- পেমেন্ট মেথড সেকশন -->
+            <div class="bg-white p-4 sm:p-5 rounded-2xl border border-gray-100 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.05)] hover:shadow-md transition-shadow duration-300 space-y-4">
+                <h4 class="font-bold text-gray-800 text-sm mb-3 flex items-center gap-2 border-b border-gray-50 pb-2">
+                    <i class="fas fa-wallet text-blue-500"></i> মোবাইল ব্যাংকিং নাম্বারসমূহ
+                </h4>
+                
+                <!-- বিকাশ -->
+                <div class="flex flex-col sm:flex-row gap-2 sm:gap-3">
+                    <div class="relative w-full flex items-center">
+                        <div class="absolute left-3 w-8 h-8 bg-pink-100 rounded-lg flex items-center justify-center text-pink-600 border border-pink-200">
+                            <i class="fas fa-mobile-alt"></i>
+                        </div>
+                        <input type="text" id="adminBkash" class="w-full pl-13 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-pink-500/30 focus:border-pink-400 transition-all text-sm font-bold text-gray-700 tracking-wider" style="padding-left: 3.25rem;" placeholder="বিকাশ নাম্বার">
+                    </div>
+                    <button onclick="updateSingleSetting('bkash', 'adminBkash')" class="bg-pink-50 hover:bg-pink-500 hover:text-white text-pink-600 border border-pink-200 px-6 py-3 rounded-xl font-bold transition-all duration-300 shadow-sm shrink-0 flex items-center justify-center gap-2">
+                        <i class="fas fa-check-circle hidden sm:inline"></i> সেভ
+                    </button>
+                </div>
+
+                <!-- নগদ -->
+                <div class="flex flex-col sm:flex-row gap-2 sm:gap-3">
+                    <div class="relative w-full flex items-center">
+                        <div class="absolute left-3 w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center text-orange-600 border border-orange-200">
+                            <i class="fas fa-mobile-alt"></i>
+                        </div>
+                        <input type="text" id="adminNagad" class="w-full pl-13 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-orange-500/30 focus:border-orange-400 transition-all text-sm font-bold text-gray-700 tracking-wider" style="padding-left: 3.25rem;" placeholder="নগদ নাম্বার">
+                    </div>
+                    <button onclick="updateSingleSetting('nagad', 'adminNagad')" class="bg-orange-50 hover:bg-orange-500 hover:text-white text-orange-600 border border-orange-200 px-6 py-3 rounded-xl font-bold transition-all duration-300 shadow-sm shrink-0 flex items-center justify-center gap-2">
+                        <i class="fas fa-check-circle hidden sm:inline"></i> সেভ
+                    </button>
+                </div>
+
+                <!-- রকেট -->
+                <div class="flex flex-col sm:flex-row gap-2 sm:gap-3">
+                    <div class="relative w-full flex items-center">
+                        <div class="absolute left-3 w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center text-purple-600 border border-purple-200">
+                            <i class="fas fa-mobile-alt"></i>
+                        </div>
+                        <input type="text" id="adminRocket" class="w-full pl-13 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-purple-500/30 focus:border-purple-400 transition-all text-sm font-bold text-gray-700 tracking-wider" style="padding-left: 3.25rem;" placeholder="রকেট নাম্বার">
+                    </div>
+                    <button onclick="updateSingleSetting('rocket', 'adminRocket')" class="bg-purple-50 hover:bg-purple-600 hover:text-white text-purple-600 border border-purple-200 px-6 py-3 rounded-xl font-bold transition-all duration-300 shadow-sm shrink-0 flex items-center justify-center gap-2">
+                        <i class="fas fa-check-circle hidden sm:inline"></i> সেভ
+                    </button>
+                </div>
+            </div>
+
+            <!-- অ্যাডমিন পাসওয়ার্ড পরিবর্তন -->
+            <div class="bg-red-50/40 p-4 sm:p-5 rounded-2xl border border-red-100 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.05)] hover:shadow-md transition-shadow duration-300 mt-6 relative overflow-hidden group">
+                <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-red-100 rounded-full opacity-50 group-hover:scale-150 transition-transform duration-700 pointer-events-none"></div>
+                <label class="flex items-center gap-2 text-sm font-bold text-red-600 mb-3 relative z-10">
+                    <i class="fas fa-shield-alt text-red-500"></i> অ্যাডমিন পাসওয়ার্ড পরিবর্তন
+                </label>
+                <div class="flex flex-col sm:flex-row gap-3 relative z-10">
+                    <div class="relative w-full flex items-center">
+                        <div class="absolute left-4 text-red-400"><i class="fas fa-key"></i></div>
+                        <input type="text" id="adminNewPass" class="w-full pl-10 pr-4 py-3 bg-white border border-red-200 rounded-xl focus:ring-2 focus:ring-red-500/30 focus:border-red-400 transition-all text-sm font-bold text-gray-700 placeholder-red-300" placeholder="নতুন পাসওয়ার্ড দিন (ডিফল্ট: 1)">
+                    </div>
+                    <button onclick="updateSingleSetting('adminPassword', 'adminNewPass')" class="bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white px-6 py-3 rounded-xl font-bold transition-all shadow-md shadow-red-500/20 shrink-0 flex items-center justify-center gap-2">
+                        <i class="fas fa-sync-alt hidden sm:inline"></i> পরিবর্তন
+                    </button>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+            <!-- ডাটা টেবিল সেকশন (Premium Design) -->
+            <div class="bg-white rounded-2xl shadow-[0_5px_30px_-5px_rgba(0,0,0,0.05)] border border-gray-100 overflow-hidden mb-8">
+                
+                <!-- টেবিল হেডার ও ফিল্টার -->
+                <div class="p-5 sm:p-6 border-b border-gray-100 flex flex-col md:flex-row justify-between items-center gap-5 md:gap-0 bg-gradient-to-b from-gray-50/50 to-white">
+                    <h3 id="tableMainTitle" class="text-lg sm:text-xl font-extrabold text-gray-800 w-full text-center md:text-left tracking-tight">
+                        <i class="fas fa-list-alt text-emerald-500 mr-2 drop-shadow-sm"></i> অনুদানের তালিকা
+                    </h3>
                     
-                    <!-- ফিল্টার বাটন -->
-                    <div class="flex bg-gray-200 rounded-lg p-1">
-                        <button onclick="setFilter('pending')" id="btnPending" class="px-3 sm:px-4 py-1.5 rounded-md text-xs sm:text-sm font-semibold bg-white shadow text-emerald-700 transition">Pending</button>
-                        <button onclick="setFilter('users')" id="btnUsers" class="px-3 sm:px-4 py-1.5 rounded-md text-xs sm:text-sm font-semibold text-gray-600 hover:text-gray-800 transition">Users</button>
-                        <button onclick="setFilter('targets')" id="btnTargets" class="px-3 sm:px-4 py-1.5 rounded-md text-xs sm:text-sm font-semibold text-gray-600 hover:text-gray-800 transition">Targets</button>
-                        <button onclick="setFilter('expenses')" id="btnExpenses" class="px-3 sm:px-4 py-1.5 rounded-md text-xs sm:text-sm font-semibold text-gray-600 hover:text-gray-800 transition">Expenses</button>
+                    <!-- মডার্ন ফিল্টার বাটন (iOS Style Segmented Control) -->
+                    <div class="flex flex-wrap justify-center bg-gray-100/80 p-1.5 rounded-xl border border-gray-200/60 w-full md:w-auto shadow-inner gap-1">
+                        <button onclick="setFilter('pending')" id="btnPending" class="px-4 sm:px-6 py-2 rounded-lg text-xs sm:text-sm font-bold bg-white shadow-sm text-emerald-600 transition-all duration-300">Pending</button>
+                        <button onclick="setFilter('users')" id="btnUsers" class="px-4 sm:px-6 py-2 rounded-lg text-xs sm:text-sm font-semibold text-gray-500 hover:text-gray-800 hover:bg-gray-200/50 transition-all duration-300">Users</button>
+                        <button onclick="setFilter('targets')" id="btnTargets" class="px-4 sm:px-6 py-2 rounded-lg text-xs sm:text-sm font-semibold text-gray-500 hover:text-gray-800 hover:bg-gray-200/50 transition-all duration-300">Targets</button>
+                        <button onclick="setFilter('expenses')" id="btnExpenses" class="px-4 sm:px-6 py-2 rounded-lg text-xs sm:text-sm font-semibold text-gray-500 hover:text-gray-800 hover:bg-gray-200/50 transition-all duration-300">Expenses</button>
                     </div>
                 </div>
 
@@ -325,7 +429,7 @@
                         <thead id="adminTableHead">
                             <!-- JS এর মাধ্যমে ডাইনামিক হেডার আসবে -->
                         </thead>
-                        <tbody id="adminTableBody" class="divide-y divide-gray-100">
+                        <tbody id="adminTableBody" class="divide-y divide-gray-50">
                             <!-- Data will be loaded here -->
                         </tbody>
                     </table>
@@ -468,219 +572,267 @@ onSnapshot(doc(db, "settings", "general_settings"), (docSnap) => {
             tbody.innerHTML = '';
             thead.innerHTML = '';
 
-            // ---- PENDING TAB ----
+            // ---- PENDING TAB (Premium Design + Mobile Fit Fix) ----
             if (window.currentFilter === 'pending') {
+                // মডার্ন টেবিল হেডার (মোবাইলের জন্য প্যাডিং কমানো হয়েছে)
                 thead.innerHTML = `
-                    <tr class="bg-gray-50 text-gray-600 text-[11px] sm:text-sm border-b">
-                        <th class="px-2 py-3 sm:p-4 font-semibold">নাম ও মোবাইল</th>
-                        <th class="px-2 py-3 sm:p-4 font-semibold text-center">মাধ্যম ও TrxID</th>
-                        <th class="px-2 py-3 sm:p-4 font-semibold text-right">পরিমাণ</th>
-                        <th class="px-1 py-3 sm:p-4 font-semibold text-center">অ্যাকশন</th>
+                    <tr class="bg-gray-50/80 text-gray-500 text-[9px] sm:text-[11px] uppercase tracking-widest border-b border-gray-100">
+                        <th class="px-2 py-3 sm:px-4 sm:py-4 font-bold text-left">নাম ও মোবাইল</th>
+                        <th class="px-1 py-3 sm:px-4 sm:py-4 font-bold text-center">মাধ্যম ও TrxID</th>
+                        <th class="px-1 py-3 sm:px-4 sm:py-4 font-bold text-right">পরিমাণ</th>
+                        <th class="px-2 py-3 sm:px-4 sm:py-4 font-bold text-center">অ্যাকশন</th>
                     </tr>
                 `;
 
                 const pendingData = window.allDonations.filter(d => d.status === 'pending');
 
                 if (pendingData.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-gray-500 font-medium">কোনো অপেক্ষমাণ (Pending) রিকোয়েস্ট নেই।</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-gray-400 font-medium bg-white">কোনো অপেক্ষমাণ (Pending) রিকোয়েস্ট নেই।</td></tr>`;
                     return;
                 }
 
                 pendingData.forEach(data => {
-                    let methodColor = "bg-gray-100 text-gray-800";
-                    if(data.method === 'বিকাশ') methodColor = "bg-pink-100 text-pink-700";
-                    if(data.method === 'নগদ') methodColor = "bg-orange-100 text-orange-700";
-                    if(data.method === 'রকেট') methodColor = "bg-purple-100 text-purple-700";
-                    if(data.method === 'ক্যাশ') methodColor = "bg-green-100 text-green-700";
+                    // পেমেন্ট মেথডের কালার
+                    let methodStyle = "bg-gray-100 text-gray-600 border-gray-200";
+                    if(data.method === 'বিকাশ') methodStyle = "bg-pink-50 text-pink-600 border-pink-100 shadow-[0_2px_10px_-3px_rgba(236,72,153,0.3)]";
+                    if(data.method === 'নগদ') methodStyle = "bg-orange-50 text-orange-600 border-orange-100 shadow-[0_2px_10px_-3px_rgba(249,115,22,0.3)]";
+                    if(data.method === 'রকেট') methodStyle = "bg-purple-50 text-purple-600 border-purple-100 shadow-[0_2px_10px_-3px_rgba(168,85,247,0.3)]";
+                    if(data.method === 'ক্যাশ') methodStyle = "bg-emerald-50 text-emerald-600 border-emerald-100 shadow-[0_2px_10px_-3px_rgba(16,185,129,0.3)]";
 
                     const mobileText = data.mobile ? data.mobile : "নম্বর নেই"; 
+                    
+                    // মোবাইলে অবতার ছোট করা হয়েছে (w-8 h-8)
                     const adminAvatar = data.photo && data.photo !== "" 
-                        ? `<img src="${data.photo}" onclick="viewFullImage('${data.photo}')" class="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover border border-gray-200 shadow-sm mr-2 sm:mr-3 cursor-pointer hover:opacity-80 transition hover:ring-2 hover:ring-emerald-400 shrink-0">` 
-                        : `<div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 mr-2 sm:mr-3 shrink-0"><i class="fas fa-user text-xs sm:text-base"></i></div>`;
+                        ? `<img src="${data.photo}" onclick="viewFullImage('${data.photo}')" class="w-8 h-8 sm:w-12 sm:h-12 rounded-full object-cover ring-2 ring-gray-100 shadow-sm mr-2 sm:mr-4 shrink-0 cursor-pointer hover:scale-110 hover:ring-emerald-300 transition-all duration-300">` 
+                        : `<div class="w-8 h-8 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center text-gray-400 ring-2 ring-gray-50 shadow-sm mr-2 sm:mr-4 shrink-0"><i class="fas fa-user text-xs sm:text-lg"></i></div>`;
 
-                    const targetBadge = data.isTargetDonation ? `<span class="bg-amber-100 text-amber-700 text-[9px] sm:text-[10px] px-1.5 py-0.5 rounded-full mt-1 sm:mt-0 sm:ml-2 inline-block whitespace-nowrap" title="লক্ষ্যমাত্রায় জমা হয়েছে">Target</span>` : '';
+                    // ব্যাজকে ছোট করে নামিয়ে দেওয়া হয়েছে যাতে জায়গা বাঁচে
+                    const targetBadge = data.isTargetDonation ? `<div class="mt-0.5"><span class="bg-amber-50 border border-amber-200/60 text-amber-600 text-[8px] sm:text-[10px] px-1.5 sm:px-2 py-0.5 rounded-full shadow-sm whitespace-nowrap font-bold inline-flex items-center gap-1" title="লক্ষ্যমাত্রায় জমা হবে"><i class="fas fa-bullseye"></i>Target</span></div>` : '';
 
                     const tr = document.createElement('tr');
-                    tr.className = "hover:bg-gray-50 transition text-xs sm:text-base";
+                    tr.className = "hover:bg-emerald-50/20 transition-colors duration-200 text-xs sm:text-base border-b border-gray-50 bg-white group";
                     tr.innerHTML = `
-                        <td class="px-2 py-3 sm:p-4 border-b">
+                        <td class="px-2 py-3 sm:px-4 sm:py-5 align-middle">
                             <div class="flex items-center">
                                 ${adminAvatar}
-                                <div>
-                                    <div class="font-bold text-gray-800 flex flex-col sm:flex-row sm:items-center leading-tight">
-                                        <span>${data.name}</span> 
-                                        ${targetBadge}
+                                <div class="min-w-0">
+                                    <div class="font-extrabold text-gray-800 tracking-tight text-[11px] sm:text-base leading-tight truncate">
+                                        ${data.name}
                                     </div>
-                                    <div class="text-[10px] sm:text-sm text-gray-500 mt-0.5 sm:mt-1"><i class="fas fa-phone-alt text-[9px] sm:text-xs mr-1"></i>${mobileText}</div>
+                                    ${targetBadge}
+                                    <div class="text-[9px] sm:text-xs text-gray-500 font-medium flex items-center gap-1 mt-1 truncate">
+                                        <i class="fas fa-phone-alt text-gray-400"></i> ${mobileText}
+                                    </div>
                                 </div>
                             </div>
                         </td>
-                        <td class="px-2 py-3 sm:p-4 border-b text-center align-middle">
-    <span class="inline-block px-1.5 py-0.5 sm:px-2 sm:py-1 rounded text-[10px] sm:text-xs font-bold ${methodColor} mb-1">${data.method}</span>
-    <div class="text-[10px] sm:text-xs text-gray-700 font-mono break-all line-clamp-2 bg-gray-100 px-2 py-1 rounded inline-block border border-gray-200">
-        <span class="text-gray-400 font-sans text-[9px] font-bold">TrxID:</span> ${data.trxId}
-    </div>
-</td>
-                        <td class="px-2 py-3 sm:p-4 border-b text-right font-bold text-sm sm:text-lg text-emerald-700 align-middle">
-                            ৳${data.amount.toLocaleString('en-IN')}
+                        <td class="px-1 py-3 sm:px-4 sm:py-5 text-center align-middle">
+                            <div class="inline-block px-2 py-0.5 sm:px-3 sm:py-1 rounded-md sm:rounded-lg text-[9px] sm:text-xs font-bold border mb-1 ${methodStyle}">
+                                ${data.method}
+                            </div>
+                            <div class="text-[9px] sm:text-xs text-gray-600 font-mono break-all line-clamp-2 bg-gray-50/80 px-1.5 py-1 sm:px-2.5 sm:py-1.5 rounded-md sm:rounded-lg inline-block border border-gray-100 shadow-inner w-full max-w-[65px] sm:max-w-none mx-auto">
+                                <span class="hidden sm:inline text-gray-400 font-sans text-[9px] font-bold tracking-wide">TrxID: </span><span class="font-semibold text-gray-700">${data.trxId}</span>
+                            </div>
                         </td>
-                        <td class="px-1 py-3 sm:p-4 border-b text-center align-middle">
-                            <div class="flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-2">
-                                <button onclick="approveData('${data.id}')" class="bg-emerald-500 hover:bg-emerald-600 text-white w-6 h-6 sm:w-8 sm:h-8 rounded-full shadow transition flex items-center justify-center" title="Approve"><i class="fas fa-check text-[10px] sm:text-base"></i></button>
-                                <button onclick="deleteData('${data.id}')" class="bg-red-500 hover:bg-red-600 text-white w-6 h-6 sm:w-8 sm:h-8 rounded-full shadow transition flex items-center justify-center" title="Reject"><i class="fas fa-times text-[10px] sm:text-base"></i></button>
+                        <td class="px-1 py-3 sm:px-4 sm:py-5 text-right align-middle">
+                            <div class="font-extrabold text-xs sm:text-xl text-emerald-600 tracking-tight">
+                                ৳${data.amount.toLocaleString('en-IN')}
+                            </div>
+                        </td>
+                        <td class="px-2 py-3 sm:px-4 sm:py-5 text-center align-middle">
+                            <!-- মোবাইলে বাটনগুলো flex-col দিয়ে উপরে-নিচে করা হয়েছে -->
+                            <div class="flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-3">
+                                <button onclick="approveData('${data.id}')" class="bg-emerald-50 hover:bg-emerald-500 hover:text-white border border-emerald-100 text-emerald-600 w-7 h-7 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl shadow-sm text-[10px] sm:text-base transition-all duration-300 flex items-center justify-center group-hover:scale-105" title="Approve">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                                <button onclick="deleteData('${data.id}')" class="bg-red-50 hover:bg-red-500 hover:text-white border border-red-100 text-red-500 w-7 h-7 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl shadow-sm text-[10px] sm:text-base transition-all duration-300 flex items-center justify-center group-hover:scale-105" title="Reject">
+                                    <i class="fas fa-times"></i>
+                                </button>
                             </div>
                         </td>
                     `;
                     tbody.appendChild(tr);
                 });
-            } 
-            // ---- USERS TAB ----
-else if (window.currentFilter === 'users') {
-    // সার্চ বক্স এবং টেবিলের হেড
-    thead.innerHTML = `
-        <tr class="bg-white border-b">
-            <td colspan="3" class="p-3">
-                <div class="flex gap-2 max-w-md mx-auto sm:mx-0">
-                    <input type="text" id="searchUserInput" value="${window.lastSearchTerm || ''}" placeholder="নাম অথবা মোবাইল নম্বর দিন..." class="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 text-sm font-bold" onkeypress="if(event.key === 'Enter') searchUserAdmin()">
-                    <button onclick="searchUserAdmin()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-bold transition flex items-center gap-1 shrink-0">
-                        <i class="fas fa-search"></i> খুঁজুন
-                    </button>
-                    <button onclick="clearUserSearch()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-2 rounded-lg text-sm font-bold transition shrink-0" title="রিসেট করুন">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-            </td>
-        </tr>
-        <tr class="bg-gray-50 text-gray-600 text-[11px] sm:text-sm border-b">
-            <th class="px-2 py-3 sm:p-4 font-semibold">ইউজারের তথ্য</th>
-            <th class="px-2 py-3 sm:p-4 font-semibold text-center">মোট অনুদান</th>
-            <th class="px-2 py-3 sm:p-4 font-semibold text-center">অ্যাকশন</th>
-        </tr>
-    `;
+            }
+            // ---- USERS TAB (Premium Design) ----
+            else if (window.currentFilter === 'users') {
+                // সার্চ বক্স এবং টেবিলের হেড
+                thead.innerHTML = `
+                    <tr class="bg-white border-b border-gray-100">
+                        <td colspan="3" class="p-4 sm:p-6 bg-gradient-to-b from-gray-50/30 to-white">
+                            <!-- Premium Search Bar -->
+                            <div class="flex relative max-w-lg mx-auto sm:mx-0 shadow-sm rounded-xl overflow-hidden border border-gray-200/80 bg-white focus-within:ring-2 focus-within:ring-blue-500/30 focus-within:border-blue-400 transition-all duration-300">
+                                <div class="flex items-center pl-4 text-gray-400">
+                                    <i class="fas fa-search"></i>
+                                </div>
+                                <input type="text" id="searchUserInput" value="${window.lastSearchTerm || ''}" placeholder="নাম অথবা মোবাইল নম্বর দিন..." class="w-full px-3 py-3 sm:py-3.5 focus:outline-none text-sm font-semibold text-gray-700 bg-transparent placeholder-gray-400" onkeypress="if(event.key === 'Enter') searchUserAdmin()">
+                                
+                                <button onclick="searchUserAdmin()" class="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white px-5 sm:px-6 font-bold transition-all shrink-0 text-xs sm:text-sm shadow-md">
+                                    খুঁজুন
+                                </button>
+                                
+                                <button onclick="clearUserSearch()" class="bg-gray-50 hover:bg-red-50 hover:text-red-500 text-gray-400 border-l border-gray-200 px-4 font-bold transition-all shrink-0" title="রিসেট করুন">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr class="bg-gray-50/80 text-gray-500 text-[10px] sm:text-[11px] uppercase tracking-widest border-b border-gray-100">
+                        <th class="px-4 py-3 sm:p-4 font-bold">ইউজারের তথ্য</th>
+                        <th class="px-4 py-3 sm:p-4 font-bold text-center">মোট অনুদান</th>
+                        <th class="px-4 py-3 sm:p-4 font-bold text-center">অ্যাকশন</th>
+                    </tr>
+                `;
 
-    if (window.allUsersData.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="3" class="p-8 text-center text-gray-500 font-medium">কোনো ইউজার পাওয়া যায়নি।</td></tr>`;
-        return;
-    }
+                if (window.allUsersData.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="3" class="p-10 text-center text-gray-400 font-medium bg-white">কোনো ইউজার পাওয়া যায়নি।</td></tr>`;
+                    return;
+                }
 
-    window.allUsersData.forEach(u => {
-        const totalAmt = u.totalAmount || 0;
-        let totalCnt = u.totalCount || 0;
+                window.allUsersData.forEach(u => {
+                    const totalAmt = u.totalAmount || 0;
+                    let totalCnt = u.totalCount || 0;
 
-        // যাদের আগে টাকা দেওয়া আছে কিন্তু হিসাব '০' হয়ে আছে, তাদের ডিফল্টভাবে '১' করে দেওয়া
-        if(totalAmt > 0 && totalCnt === 0) {
-            totalCnt = 1;
-        }
+                    if(totalAmt > 0 && totalCnt === 0) {
+                        totalCnt = 1;
+                    }
 
-        const adminAvatar = u.photo && u.photo !== "" 
-            ? `<img src="${u.photo}" class="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover border border-gray-200 shadow-sm mr-2 sm:mr-3 shrink-0">` 
-            : `<div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 mr-2 sm:mr-3 shrink-0"><i class="fas fa-user"></i></div>`;
+                    const adminAvatar = u.photo && u.photo !== "" 
+                        ? `<img src="${u.photo}" class="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover ring-2 ring-gray-100 shadow-sm mr-3 sm:mr-4 shrink-0 transition-transform hover:scale-110 duration-300">` 
+                        : `<div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center text-gray-400 ring-2 ring-gray-50 shadow-sm mr-3 sm:mr-4 shrink-0"><i class="fas fa-user text-lg"></i></div>`;
 
-        const amountColor = totalAmt > 0 ? "text-emerald-700" : "text-gray-400";
-        const isZero = totalAmt === 0;
+                    const amountColor = totalAmt > 0 ? "text-emerald-600" : "text-gray-400";
+                    const isZero = totalAmt === 0;
 
-        const tr = document.createElement('tr');
-        tr.className = `hover:bg-gray-50 transition text-xs sm:text-base ${isZero ? 'bg-gray-50/50' : ''}`;
-        tr.innerHTML = `
-            <td class="px-2 py-3 sm:p-4 border-b">
-                <div class="flex items-center">
-                    ${adminAvatar}
-                    <div>
-                        <div class="font-bold text-gray-800 leading-tight flex items-center gap-2">
-                            ${u.name}
-                        </div>
-                        <div class="text-[10px] sm:text-sm text-gray-500 mt-0.5 sm:mt-1"><i class="fas fa-phone-alt text-[9px] sm:text-xs mr-1"></i>${u.mobile}</div>
-                    </div>
-                </div>
-            </td>
-            <td class="px-2 py-3 sm:p-4 border-b text-center align-middle">
-                <div class="font-bold text-sm sm:text-lg ${amountColor} mb-1">৳${totalAmt.toLocaleString('en-IN')}</div>
-                <div class="text-[9px] sm:text-[11px] text-gray-500 font-semibold bg-gray-100 inline-block px-1.5 py-0.5 sm:px-2 rounded-full">${totalCnt} বার অনুদান</div>
-            </td>
-            <td class="px-2 py-3 sm:p-4 border-b text-center align-middle">
-    <div class="flex items-center justify-center gap-2 mt-1 sm:mt-0">
-        <button onclick="viewUserHistory('${u.mobile}')" class="${isZero ? 'opacity-50 cursor-not-allowed bg-gray-100 border-gray-200 text-gray-400' : 'bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-600'} w-7 h-7 sm:w-8 sm:h-8 rounded shadow-sm text-xs sm:text-sm font-semibold transition flex items-center justify-center" ${isZero ? 'disabled' : ''} title="হিস্ট্রি দেখুন">
-            <i class="fas fa-history"></i>
-        </button>
-        <button onclick="editUserProfile('${u.mobile}')" class="bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-600 w-7 h-7 sm:w-8 sm:h-8 rounded shadow-sm text-xs sm:text-sm font-semibold transition flex items-center justify-center" title="প্রোফাইল এডিট করুন">
-            <i class="fas fa-user-edit"></i>
-        </button>
-    </div>
-</td>
-        `;
-        tbody.appendChild(tr);
-    });
-}
-            // ---- TARGETS (SPLIT VIEW) TAB ----
+                    const tr = document.createElement('tr');
+                    tr.className = `hover:bg-blue-50/30 transition-colors duration-200 text-xs sm:text-base border-b border-gray-50 ${isZero ? 'bg-gray-50/40 opacity-70' : 'bg-white'}`;
+                    tr.innerHTML = `
+                        <td class="px-4 py-4 sm:p-5">
+                            <div class="flex items-center">
+                                ${adminAvatar}
+                                <div>
+                                    <div class="font-extrabold text-gray-800 tracking-tight text-sm sm:text-base mb-0.5">
+                                        ${u.name}
+                                    </div>
+                                    <div class="text-[11px] sm:text-xs text-gray-500 font-medium flex items-center gap-1.5">
+                                        <i class="fas fa-phone-alt text-gray-400"></i> ${u.mobile}
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-4 py-4 sm:p-5 text-center align-middle">
+                            <div class="font-extrabold text-base sm:text-xl ${amountColor} tracking-tight mb-1">৳${totalAmt.toLocaleString('en-IN')}</div>
+                            <div class="text-[10px] sm:text-[11px] text-blue-700 font-bold bg-blue-50 border border-blue-100 inline-block px-2.5 py-0.5 rounded-full shadow-sm">
+                                ${totalCnt} বার অনুদান
+                            </div>
+                        </td>
+                        <td class="px-4 py-4 sm:p-5 text-center align-middle">
+                            <div class="flex items-center justify-center gap-2 sm:gap-3">
+                                <button onclick="viewUserHistory('${u.mobile}')" class="${isZero ? 'cursor-not-allowed bg-gray-100 text-gray-400' : 'bg-blue-50 hover:bg-blue-500 hover:text-white border border-blue-100 text-blue-600'} w-8 h-8 sm:w-10 sm:h-10 rounded-xl shadow-sm text-sm sm:text-base transition-all duration-300 flex items-center justify-center" ${isZero ? 'disabled' : ''} title="হিস্ট্রি দেখুন">
+                                    <i class="fas fa-history"></i>
+                                </button>
+                                <button onclick="editUserProfile('${u.mobile}')" class="bg-amber-50 hover:bg-amber-500 hover:text-white border border-amber-100 text-amber-600 w-8 h-8 sm:w-10 sm:h-10 rounded-xl shadow-sm text-sm sm:text-base transition-all duration-300 flex items-center justify-center" title="প্রোফাইল এডিট করুন">
+                                    <i class="fas fa-user-edit"></i>
+                                </button>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+            // ---- TARGETS (SPLIT VIEW) TAB (Premium Design) ----
             else if (window.currentFilter === 'targets') {
                 let contentHtml = '';
+
+                // টেবিলের গ্লোবাল হেডার
+                thead.innerHTML = `
+                    <tr class="bg-gray-50/80 text-gray-500 text-[10px] sm:text-[11px] uppercase tracking-widest border-b border-gray-100">
+                        <th class="px-4 py-3 sm:p-4 font-bold">লক্ষ্যমাত্রার নাম</th>
+                        <th class="px-4 py-3 sm:p-4 font-bold text-center">পরিমাণ</th>
+                        <th class="px-4 py-3 sm:p-4 font-bold text-center">অ্যাকশন</th>
+                    </tr>
+                `;
 
                 // === ১. চলমান লক্ষ্যমাত্রা সেকশন ===
                 contentHtml += `
                     <tr>
-                        <td colspan="3" class="bg-blue-50 px-4 py-2 text-sm font-bold text-blue-800 border-y border-blue-200">
-                            <i class="fas fa-spinner fa-spin mr-1"></i> চলমান লক্ষ্যমাত্রা (Active)
+                        <td colspan="3" class="p-0 border-b-0">
+                            <div class="bg-gradient-to-r from-blue-50 to-blue-100/50 px-4 py-2.5 sm:px-6 sm:py-3 border-y border-blue-200/60 flex items-center gap-2">
+                                <!-- Live Pulsing Dot Animation -->
+                                <span class="relative flex h-2.5 w-2.5 sm:h-3 sm:w-3">
+                                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                                  <span class="relative inline-flex rounded-full h-2.5 w-2.5 sm:h-3 sm:w-3 bg-blue-600"></span>
+                                </span>
+                                <span class="text-xs sm:text-sm font-bold text-blue-800 tracking-wide uppercase">চলমান লক্ষ্যমাত্রা (Active)</span>
+                            </div>
                         </td>
-                    </tr>
-                    <tr class="bg-gray-100 text-gray-600 text-[11px] sm:text-sm border-b">
-                        <th class="px-2 py-2 sm:p-3 font-semibold">লক্ষ্যমাত্রার নাম</th>
-                        <th class="px-2 py-2 sm:p-3 font-semibold text-center">পরিমাণ</th>
-                        <th class="px-2 py-2 sm:p-3 font-semibold text-center">অ্যাকশন</th>
                     </tr>
                 `;
 
                 if (window.activeTargetInfo) {
                     contentHtml += `
-                        <tr class="hover:bg-blue-50 transition text-xs sm:text-base border-b bg-white">
-                            <td class="px-2 py-3 sm:p-4">
-                                <div class="font-bold text-gray-800"><i class="fas fa-bullseye text-blue-500 mr-1"></i> ${window.activeTargetInfo.reason}</div>
+                        <tr class="hover:bg-blue-50/30 transition-colors duration-200 text-xs sm:text-base border-b border-gray-50 bg-white">
+                            <td class="px-4 py-4 sm:p-5">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center text-blue-600 shadow-sm shrink-0">
+                                        <i class="fas fa-bullseye text-lg sm:text-xl"></i>
+                                    </div>
+                                    <div class="font-extrabold text-gray-800 tracking-tight text-sm sm:text-base leading-tight">${window.activeTargetInfo.reason}</div>
+                                </div>
                             </td>
-                            <td class="px-2 py-3 sm:p-4 text-center align-middle">
-                                <div class="font-bold text-sm sm:text-lg text-blue-700">৳${window.activeTargetInfo.amount.toLocaleString('en-IN')}</div>
+                            <td class="px-4 py-4 sm:p-5 text-center align-middle">
+                                <div class="font-extrabold text-base sm:text-xl text-blue-700 tracking-tight">৳${window.activeTargetInfo.amount.toLocaleString('en-IN')}</div>
                             </td>
-                            <td class="px-2 py-3 sm:p-4 text-center align-middle">
+                            <td class="px-4 py-4 sm:p-5 text-center align-middle">
                                 <div class="flex justify-center gap-2">
-                                    <button onclick="viewTargetDetails('${window.activeTargetInfo.sessionId}', '${window.activeTargetInfo.reason}', ${window.activeTargetInfo.amount})" class="bg-blue-100 border border-blue-300 text-blue-700 px-3 py-1.5 rounded shadow-sm text-[10px] sm:text-sm font-bold hover:bg-blue-200 transition">
-                                        <i class="fas fa-eye"></i> বিস্তারিত
+                                    <button onclick="viewTargetDetails('${window.activeTargetInfo.sessionId}', '${window.activeTargetInfo.reason}', ${window.activeTargetInfo.amount})" class="bg-blue-50 hover:bg-blue-600 hover:text-white border border-blue-100 text-blue-600 px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl shadow-sm text-xs sm:text-sm font-bold transition-all duration-300 flex items-center gap-2 group">
+                                        <i class="fas fa-eye group-hover:scale-110 transition-transform"></i> <span class="hidden sm:inline">বিস্তারিত</span>
                                     </button>
                                 </div>
                             </td>
                         </tr>
                     `;
                 } else {
-                    contentHtml += `<tr><td colspan="3" class="p-4 text-center text-gray-500 text-sm bg-white border-b">বর্তমানে কোনো লক্ষ্যমাত্রা চালু নেই।</td></tr>`;
+                    contentHtml += `<tr><td colspan="3" class="p-8 text-center text-gray-400 font-medium bg-white">বর্তমানে কোনো লক্ষ্যমাত্রা চালু নেই।</td></tr>`;
                 }
 
                 // === ২. অতীতের লক্ষ্যমাত্রা সেকশন ===
                 contentHtml += `
                     <tr>
-                        <td colspan="3" class="bg-gray-100 px-4 py-2 mt-4 text-sm font-bold text-gray-700 border-y border-gray-200">
-                            <i class="fas fa-history mr-1 text-gray-500"></i> অতীতের লক্ষ্যমাত্রা (Past Targets)
+                        <td colspan="3" class="p-0 border-b-0">
+                            <div class="bg-gradient-to-r from-gray-50 to-gray-100/50 px-4 py-2.5 sm:px-6 sm:py-3 border-y border-gray-200/60 mt-4 flex items-center gap-2">
+                                <i class="fas fa-history text-gray-400"></i>
+                                <span class="text-xs sm:text-sm font-bold text-gray-600 tracking-wide uppercase">অতীতের লক্ষ্যমাত্রা (Past Targets)</span>
+                            </div>
                         </td>
-                    </tr>
-                    <tr class="bg-gray-50 text-gray-600 text-[11px] sm:text-sm border-b">
-                        <th class="px-2 py-2 sm:p-3 font-semibold">লক্ষ্যমাত্রার নাম</th>
-                        <th class="px-2 py-2 sm:p-3 font-semibold text-center">পরিমাণ</th>
-                        <th class="px-2 py-2 sm:p-3 font-semibold text-center">অ্যাকশন</th>
                     </tr>
                 `;
 
                 if (window.allPastTargets.length === 0) {
-                    contentHtml += `<tr><td colspan="3" class="p-6 text-center text-gray-500 text-sm bg-white">অতীতের কোনো লক্ষ্যমাত্রা নেই।</td></tr>`;
+                    contentHtml += `<tr><td colspan="3" class="p-8 text-center text-gray-400 font-medium bg-white border-b border-gray-50">অতীতের কোনো লক্ষ্যমাত্রা নেই।</td></tr>`;
                 } else {
                     window.allPastTargets.forEach(t => {
                         contentHtml += `
-                            <tr class="hover:bg-gray-50 transition text-xs sm:text-base border-b bg-white">
-                                <td class="px-2 py-3 sm:p-4">
-                                    <div class="font-bold text-gray-800"><i class="fas fa-check-circle text-emerald-500 mr-1"></i> ${t.targetReason}</div>
+                            <tr class="hover:bg-gray-50/70 transition-colors duration-200 text-xs sm:text-base border-b border-gray-50 bg-white group">
+                                <td class="px-4 py-4 sm:p-5">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-emerald-50 to-emerald-100 flex items-center justify-center text-emerald-500 shadow-sm shrink-0 group-hover:scale-105 transition-transform">
+                                            <i class="fas fa-check-circle text-lg sm:text-xl"></i>
+                                        </div>
+                                        <div class="font-bold text-gray-700 tracking-tight text-sm sm:text-base leading-tight group-hover:text-emerald-700 transition-colors">${t.targetReason}</div>
+                                    </div>
                                 </td>
-                                <td class="px-2 py-3 sm:p-4 text-center align-middle">
-                                    <div class="font-bold text-sm sm:text-lg text-gray-600">৳${t.targetAmount.toLocaleString('en-IN')}</div>
+                                <td class="px-4 py-4 sm:p-5 text-center align-middle">
+                                    <div class="font-extrabold text-base sm:text-xl text-gray-500 tracking-tight">৳${t.targetAmount.toLocaleString('en-IN')}</div>
                                 </td>
-                                <td class="px-2 py-3 sm:p-4 text-center align-middle">
-                                    <div class="flex justify-center gap-2">
-                                        <button onclick="viewTargetDetails('${t.targetSessionId}', '${t.targetReason}', ${t.targetAmount})" class="bg-gray-100 border border-gray-300 text-gray-700 px-3 py-1.5 rounded shadow-sm text-[10px] sm:text-sm font-semibold hover:bg-gray-200 transition"><i class="fas fa-eye"></i> বিস্তারিত</button>
-                                        <button onclick="deletePastTarget('${t.id}')" class="bg-red-50 border border-red-200 text-red-600 px-3 py-1.5 rounded shadow-sm text-[10px] sm:text-sm font-semibold hover:bg-red-100 transition"><i class="fas fa-trash"></i></button>
+                                <td class="px-4 py-4 sm:p-5 text-center align-middle">
+                                    <div class="flex justify-center items-center gap-2 sm:gap-3">
+                                        <button onclick="viewTargetDetails('${t.targetSessionId}', '${t.targetReason}', ${t.targetAmount})" class="bg-gray-50 hover:bg-gray-200 border border-gray-200/80 text-gray-700 w-8 h-8 sm:w-auto sm:px-4 sm:py-2 rounded-xl shadow-sm text-sm font-semibold transition-all duration-300 flex items-center justify-center gap-0 sm:gap-2" title="বিস্তারিত">
+                                            <i class="fas fa-eye"></i> <span class="hidden sm:inline">বিস্তারিত</span>
+                                        </button>
+                                        <button onclick="deletePastTarget('${t.id}')" class="bg-red-50 hover:bg-red-500 hover:text-white border border-red-100 text-red-500 w-8 h-8 sm:w-10 sm:h-10 rounded-xl shadow-sm text-sm transition-all duration-300 flex items-center justify-center" title="ডিলিট করুন">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
                                     </div>
                                 </td>
                             </tr>
@@ -691,37 +843,61 @@ else if (window.currentFilter === 'users') {
                 tbody.innerHTML = contentHtml;
             }
             
-            // ---- EXPENSES TAB ----
+            // ---- EXPENSES TAB (Premium Design) ----
             else if (window.currentFilter === 'expenses') {
+                // মডার্ন টেবিল হেডার
                 thead.innerHTML = `
-                    <tr class="bg-red-50 text-red-800 text-[11px] sm:text-sm border-b">
-                        <th class="px-2 py-3 sm:p-4 font-semibold">তারিখ ও বিবরণ</th>
-                        <th class="px-2 py-3 sm:p-4 font-semibold text-right">পরিমাণ</th>
-                        <th class="px-1 py-3 sm:p-4 font-semibold text-center">অ্যাকশন</th>
+                    <tr class="bg-gray-50/80 text-gray-500 text-[9px] sm:text-[11px] uppercase tracking-widest border-b border-gray-100">
+                        <th class="px-3 py-3 sm:px-4 sm:py-4 font-bold text-left">তারিখ ও বিবরণ</th>
+                        <th class="px-2 py-3 sm:px-4 sm:py-4 font-bold text-right">পরিমাণ</th>
+                        <th class="px-2 py-3 sm:px-4 sm:py-4 font-bold text-center">অ্যাকশন</th>
                     </tr>
                 `;
 
                 if (!window.allExpensesData || window.allExpensesData.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="3" class="p-8 text-center text-gray-500 font-medium">কোনো খরচের রেকর্ড নেই।</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="3" class="p-8 text-center text-gray-400 font-medium bg-white">কোনো খরচের রেকর্ড নেই।</td></tr>`;
                     return;
                 }
 
                 window.allExpensesData.forEach(ex => {
+                    // তারিখ ও সময়কে একটু সুন্দর ফরম্যাটে সাজানো
                     const dateObj = ex.timestamp ? ex.timestamp.toDate() : new Date();
-                    const dateStr = dateObj.toLocaleDateString('en-GB') + ' ' + dateObj.toLocaleTimeString('en-GB', { hour: '2-digit', minute:'2-digit' });
+                    const dateStr = dateObj.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+                    const timeStr = dateObj.toLocaleTimeString('en-GB', { hour: '2-digit', minute:'2-digit', hour12: true });
                     
                     const tr = document.createElement('tr');
-                    tr.className = "hover:bg-red-50/50 transition text-xs sm:text-base border-b bg-white";
+                    tr.className = "hover:bg-red-50/30 transition-colors duration-200 text-xs sm:text-base border-b border-gray-50 bg-white group";
                     tr.innerHTML = `
-                        <td class="px-2 py-3 sm:p-4">
-                            <div class="font-bold text-gray-800 text-sm sm:text-base">${ex.reason}</div>
-                            <div class="text-[10px] sm:text-xs text-gray-500 mt-1"><i class="far fa-clock mr-1"></i>${dateStr}</div>
+                        <td class="px-3 py-3 sm:px-4 sm:py-5 align-middle">
+                            <div class="flex items-center gap-2.5 sm:gap-4">
+                                <!-- খরচের আইকন (Premium Box) -->
+                                <div class="w-8 h-8 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-gradient-to-br from-red-50 to-red-100 flex items-center justify-center text-red-500 shadow-sm shrink-0 group-hover:scale-105 transition-transform duration-300 border border-red-100/50">
+                                    <i class="fas fa-file-invoice-dollar text-xs sm:text-lg"></i>
+                                </div>
+                                <div class="min-w-0">
+                                    <div class="font-extrabold text-gray-800 tracking-tight text-[11px] sm:text-base leading-tight truncate">
+                                        ${ex.reason}
+                                    </div>
+                                    <div class="text-[9px] sm:text-xs text-gray-500 font-medium flex items-center gap-1.5 mt-1 sm:mt-1.5 truncate">
+                                        <div class="flex items-center gap-1 bg-gray-50 px-1.5 py-0.5 rounded border border-gray-100 shadow-inner">
+                                            <i class="far fa-calendar-alt text-gray-400"></i> <span class="text-gray-500">${dateStr}</span>
+                                        </div>
+                                        <div class="text-gray-400 flex items-center gap-1">
+                                            <i class="far fa-clock"></i> ${timeStr}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </td>
-                        <td class="px-2 py-3 sm:p-4 text-right align-middle">
-                            <div class="font-bold text-sm sm:text-lg text-red-600">- ৳${ex.amount.toLocaleString('en-IN')}</div>
-                        </td>
-                        <td class="px-1 py-3 sm:p-4 text-center align-middle">
-                            <button onclick="deleteExpense('${ex.id}', ${ex.amount})" class="bg-gray-100 hover:bg-red-100 text-red-500 border border-red-200 px-3 py-1.5 rounded shadow-sm text-[10px] sm:text-sm font-bold transition flex items-center justify-center mx-auto gap-1">
+                        <td class="px-2 py-3 sm:px-4 sm:py-5 text-right align-middle">
+    <div class="flex items-center justify-end h-full">
+        <div class="font-extrabold text-xs sm:text-xl text-red-500 tracking-tight flex items-center gap-0.5 sm:gap-1">
+            <span class="text-red-300 text-[10px] sm:text-sm font-bold">-</span> ৳${ex.amount.toLocaleString('en-IN')}
+        </div>
+    </div>
+</td>
+                        <td class="px-2 py-3 sm:px-4 sm:py-5 text-center align-middle">
+                            <button onclick="deleteExpense('${ex.id}', ${ex.amount})" class="bg-red-50 hover:bg-red-500 hover:text-white border border-red-100 text-red-500 px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg sm:rounded-xl shadow-sm text-[10px] sm:text-sm font-bold transition-all duration-300 flex items-center justify-center mx-auto gap-1.5 group-hover:scale-105" title="ডিলিট করুন">
                                 <i class="fas fa-trash"></i> <span class="hidden sm:inline">ডিলিট</span>
                             </button>
                         </td>
@@ -731,13 +907,11 @@ else if (window.currentFilter === 'users') {
             }
         }
 
-       // হিস্ট্রি দেখার ফাংশন (সরাসরি ডাটাবেস থেকে টানবে)
+       // হিস্ট্রি দেখার ফাংশন (Premium Design - Fixed)
         window.viewUserHistory = async function(mobile) {
-            // প্রথমে লোডিং দেখাবে
             Swal.fire({ title: 'লোড হচ্ছে...', didOpen: () => Swal.showLoading() });
 
             try {
-                // ফায়ারবেস থেকে শুধুমাত্র এই নির্দিষ্ট ইউজারের অ্যাপ্রুভড ডাটাগুলো আনবে
                 const q = query(
                     collection(db, "donations"), 
                     where("mobile", "==", mobile), 
@@ -748,80 +922,116 @@ else if (window.currentFilter === 'users') {
                 let historyData = [];
                 snapshot.forEach(doc => {
                     let d = doc.data();
-                    d.id = doc.id; // ডিলিট করার জন্য আইডি লাগবে
+                    d.id = doc.id; 
                     historyData.push(d);
                 });
 
-                // যদি কোনো হিস্ট্রি না থাকে
                 if (historyData.length === 0) {
                     Swal.fire('তথ্য নেই', 'এই ইউজারের কোনো অ্যাপ্রুভড অনুদান পাওয়া যায়নি।', 'info');
                     return;
                 }
 
-                // সময় অনুযায়ী সাজানো (নতুনটা উপরে)
-historyData.sort((a, b) => {
-    const getT = (t) => (t && typeof t.toMillis === 'function') ? t.toMillis() : 0;
-    return getT(b.timestamp) - getT(a.timestamp);
-});
+                historyData.sort((a, b) => {
+                    const getT = (t) => (t && typeof t.toMillis === 'function') ? t.toMillis() : 0;
+                    return getT(b.timestamp) - getT(a.timestamp);
+                });
 
-                const userName = historyData[0].name; // ইউজারের নাম
+                // ইউজারের নাম এবং আসল ছবি নেওয়া
+                const userName = historyData[0].name; 
+                const userPhoto = historyData[0].photo; 
+                
+                // ছবি থাকলে ছবি দেখাবে, না থাকলে আইকন
+                const avatarHtml = userPhoto && userPhoto !== "" 
+                    ? `<img src="${userPhoto}" class="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover ring-4 ring-blue-50 shadow-lg mx-auto">` 
+                    : `<div class="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center text-blue-500 ring-4 ring-blue-50 shadow-lg mx-auto"><i class="fas fa-user text-3xl sm:text-4xl"></i></div>`;
 
                 let tableRows = '';
                 historyData.forEach(d => {
                     const dateObj = d.timestamp?.toDate ? d.timestamp.toDate() : new Date();
-                    const dateStr = dateObj.toLocaleDateString('en-GB');
-                    // সুন্দর ডিজাইনের এডিট ও ডিলিট বাটন
-const editBtn = `<button onclick="editTransaction('${d.id}')" class="bg-amber-50 hover:bg-amber-100 text-amber-600 border border-amber-200 w-6 h-6 sm:w-7 sm:h-7 rounded flex items-center justify-center transition shadow-sm" title="এডিট করুন"><i class="fas fa-edit text-[10px] sm:text-xs"></i></button>`;
-const deleteBtn = `<button onclick="deleteData('${d.id}')" class="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 w-6 h-6 sm:w-7 sm:h-7 rounded flex items-center justify-center transition shadow-sm" title="ডিলিট করুন"><i class="fas fa-trash text-[10px] sm:text-xs"></i></button>`;
+                    const dateStr = dateObj.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+                    
+                    const editBtn = `<button onclick="editTransaction('${d.id}')" class="bg-amber-50 hover:bg-amber-500 hover:text-white text-amber-500 border border-amber-100 w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center transition-all duration-300 shadow-sm" title="এডিট করুন"><i class="fas fa-edit text-[10px] sm:text-xs"></i></button>`;
+                    const deleteBtn = `<button onclick="deleteData('${d.id}')" class="bg-red-50 hover:bg-red-500 hover:text-white text-red-500 border border-red-100 w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center transition-all duration-300 shadow-sm" title="ডিলিট করুন"><i class="fas fa-trash text-[10px] sm:text-xs"></i></button>`;
 
-const targetBadge = d.isTargetDonation ? `<span class="bg-amber-100 text-amber-700 text-[9px] px-1.5 py-0.5 rounded-full ml-1 align-middle" title="লক্ষ্যমাত্রায় জমা হয়েছে">Target</span>` : '';
+                    const targetBadge = d.isTargetDonation ? `<span class="bg-gradient-to-r from-amber-100 to-orange-100 border border-amber-200 text-amber-700 text-[8px] sm:text-[9px] px-2 py-0.5 rounded-full ml-1 align-middle font-bold shadow-sm inline-flex items-center"><i class="fas fa-bullseye mr-1"></i>Target</span>` : '';
 
-// TrxID এর আগে "TrxID:" লেখা বসানোর লজিক
-let trxText = d.trxId;
-if (d.method !== 'ক্যাশ' && !d.trxId.includes('অফলাইন')) {
-    trxText = `<span class="font-bold text-gray-500">TrxID:</span> ${d.trxId}`;
-}
+                    let methodStyle = "bg-gray-100 text-gray-600 border-gray-200";
+                    if(d.method === 'বিকাশ') methodStyle = "bg-pink-50 text-pink-600 border-pink-100 shadow-[0_2px_10px_-3px_rgba(236,72,153,0.3)]";
+                    if(d.method === 'নগদ') methodStyle = "bg-orange-50 text-orange-600 border-orange-100 shadow-[0_2px_10px_-3px_rgba(249,115,22,0.3)]";
+                    if(d.method === 'রকেট') methodStyle = "bg-purple-50 text-purple-600 border-purple-100 shadow-[0_2px_10px_-3px_rgba(168,85,247,0.3)]";
+                    if(d.method === 'ক্যাশ') methodStyle = "bg-emerald-50 text-emerald-600 border-emerald-100 shadow-[0_2px_10px_-3px_rgba(16,185,129,0.3)]";
 
-tableRows += `
-    <tr class="border-b border-gray-200 text-left text-sm hover:bg-gray-50 transition">
-        <td class="py-3 px-2 text-gray-600 whitespace-nowrap">${dateStr}</td>
-        <td class="py-3 px-2">
-            <span class="font-bold text-gray-700">${d.method}</span> ${targetBadge}<br>
-            <span class="text-[10px] text-gray-400 break-all">${trxText}</span>
-        </td>
-        <td class="py-3 px-2 text-right whitespace-nowrap align-middle">
-            <div class="flex items-center justify-end gap-1.5 sm:gap-2">
-                <span class="font-bold text-emerald-600 text-sm sm:text-base mr-1">৳${d.amount.toLocaleString('en-IN')}</span>
-                ${editBtn}
-                ${deleteBtn}
-            </div>
-        </td>
-    </tr>
-`;
+                    let trxHtml = '';
+                    if (d.method !== 'ক্যাশ' && !d.trxId.includes('অফলাইন')) {
+                        trxHtml = `<div class="text-[9px] sm:text-[10px] text-gray-500 font-mono bg-gray-50/80 px-1.5 py-1 rounded border border-gray-100 mt-1 inline-block shadow-inner truncate max-w-[120px] sm:max-w-xs"><span class="font-bold text-gray-400 font-sans">TrxID:</span> <span class="font-semibold text-gray-700">${d.trxId}</span></div>`;
+                    } else {
+                        trxHtml = `<div class="text-[9px] sm:text-[10px] text-gray-400 bg-gray-50/80 px-1.5 py-1 rounded border border-gray-100 mt-1 inline-block shadow-inner">${d.trxId}</div>`;
+                    }
+
+                    tableRows += `
+                        <tr class="hover:bg-blue-50/30 transition-colors duration-200 border-b border-gray-50 bg-white group">
+                            <td class="py-3 px-2 sm:p-4 align-middle w-1/3">
+                                <div class="flex items-center gap-1.5 bg-gray-50 w-max px-2 py-1.5 rounded-md border border-gray-100 shadow-sm">
+                                    <i class="far fa-calendar-alt text-gray-400 text-[10px] sm:text-xs"></i>
+                                    <span class="text-[10px] sm:text-xs font-bold text-gray-600">${dateStr}</span>
+                                </div>
+                            </td>
+                            <td class="py-3 px-2 sm:p-4 align-middle">
+                                <div class="flex items-center flex-wrap gap-1 mb-0.5">
+                                    <span class="inline-block px-2 sm:px-2.5 py-0.5 rounded-md text-[9px] sm:text-[10px] font-bold border ${methodStyle}">${d.method}</span>
+                                    ${targetBadge}
+                                </div>
+                                ${trxHtml}
+                            </td>
+                            <td class="py-3 px-2 sm:p-4 text-right align-middle">
+                                <div class="font-extrabold text-sm sm:text-xl text-emerald-600 tracking-tight mb-1 sm:mb-2">৳${d.amount.toLocaleString('en-IN')}</div>
+                                <div class="flex justify-end gap-1.5 sm:gap-2">
+                                    ${editBtn}
+                                    ${deleteBtn}
+                                </div>
+                            </td>
+                        </tr>
+                    `;
                 });
 
+                // টাইটেল বাদ দিয়ে সব HTML এর ভেতরে নেওয়া হয়েছে যাতে গ্যাপ তৈরি না হয়
                 const htmlContent = `
-                    <div class="max-h-64 overflow-y-auto mt-2">
-                        <table class="w-full border-collapse">
-                            <thead class="bg-gray-100 text-gray-700 text-sm sticky top-0 shadow-sm">
-                                <tr>
-                                    <th class="py-2 px-2 text-left rounded-tl-md">তারিখ</th>
-                                    <th class="py-2 px-2 text-left">মাধ্যম</th>
-                                    <th class="py-2 px-2 text-right rounded-tr-md">পরিমাণ</th>
-                                </tr>
-                            </thead>
-                            <tbody>${tableRows}</tbody>
-                        </table>
+                    <div class="mt-2 mb-5">
+                        ${avatarHtml}
+                        <h2 class="text-xl sm:text-2xl font-extrabold text-gray-800 tracking-tight mt-3 mb-2 leading-tight">${userName}</h2>
+                        <div class="inline-flex items-center gap-1.5 text-[10px] sm:text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1.5 rounded-full border border-blue-100 shadow-sm">
+                            <i class="fas fa-history"></i> অনুদানের হিস্ট্রি
+                        </div>
+                    </div>
+
+                    <div class="rounded-xl border border-gray-200 shadow-sm overflow-hidden bg-white text-left">
+                        <div class="max-h-[50vh] overflow-y-auto">
+                            <table class="w-full border-collapse">
+                                <thead class="bg-gray-50 text-gray-500 text-[9px] sm:text-[10px] uppercase tracking-widest sticky top-0 z-10 border-b border-gray-200 shadow-sm">
+                                    <tr>
+                                        <th class="py-3 px-3 sm:p-4 font-bold text-left">তারিখ</th>
+                                        <th class="py-3 px-3 sm:p-4 font-bold text-left">মাধ্যম ও বিবরণ</th>
+                                        <th class="py-3 px-3 sm:p-4 font-bold text-right">পরিমাণ ও অ্যাকশন</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-100">
+                                    ${tableRows}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 `;
 
                 Swal.fire({
-                    title: `<span class="text-lg font-bold text-gray-800"><i class="fas fa-user-circle text-blue-500 mr-1"></i> ${userName}</span>`,
-                    html: htmlContent,
+                    html: htmlContent, // সব কন্টেন্ট এখানে
                     showCloseButton: true,
                     showConfirmButton: false,
                     width: '100%',
-                    customClass: { popup: 'max-w-md rounded-2xl' }
+                    padding: '1.5em',
+                    customClass: { 
+                        popup: 'max-w-lg rounded-2xl shadow-2xl border border-gray-100',
+                        closeButton: 'focus:outline-none'
+                    }
                 });
 
             } catch (error) {
@@ -1148,75 +1358,65 @@ window.editUserProfile = async function(oldMobile) {
 }
 
         window.setFilter = async function(type) {
-    window.currentFilter = type;
-    const btnP = document.getElementById('btnPending');
-    const btnU = document.getElementById('btnUsers');
-    const btnT = document.getElementById('btnTargets');
-    const btnE = document.getElementById('btnExpenses'); // নতুন লাইন
-    const titleText = document.getElementById('tableMainTitle');
+            window.currentFilter = type;
+            const btnP = document.getElementById('btnPending');
+            const btnU = document.getElementById('btnUsers');
+            const btnT = document.getElementById('btnTargets');
+            const btnE = document.getElementById('btnExpenses'); 
+            const titleText = document.getElementById('tableMainTitle');
 
-    // এখানে btnE যোগ করা হয়েছে
-    [btnP, btnU, btnT, btnE].forEach(btn => { 
-        if(btn) btn.className = "px-3 sm:px-4 py-1.5 rounded-md text-xs sm:text-sm font-semibold text-gray-600 hover:text-gray-800 transition"; 
-    });
+            // সব বাটনকে ইনএক্টিভ (ডিফল্ট) স্টাইলে নেওয়া
+            const defaultClass = "px-4 sm:px-6 py-2 rounded-lg text-xs sm:text-sm font-semibold text-gray-500 hover:text-gray-800 hover:bg-gray-200/50 transition-all duration-300";
+            [btnP, btnU, btnT, btnE].forEach(btn => { if(btn) btn.className = defaultClass; });
 
-    if(type === 'pending') {
-        btnP.className = "px-3 sm:px-4 py-1.5 rounded-md text-xs sm:text-sm font-semibold bg-white shadow text-emerald-700 transition";
-        titleText.innerHTML = '<i class="fas fa-list-alt text-emerald-600 mr-2"></i> অনুদানের তালিকা';
-        window.renderTable();
-    }
-    
-    // যখন ইউজার ট্যাবে ক্লিক করবে, শুধু তখনই ফায়ারবেস থেকে ডাটা টানবে
-    if(type === 'users') {
-    btnU.className = "px-3 sm:px-4 py-1.5 rounded-md text-xs sm:text-sm font-semibold bg-white shadow text-emerald-700 transition";
-    titleText.innerHTML = '<i class="fas fa-users text-blue-500 mr-2"></i> টপ ২০ দাতার তালিকা';
-    
-    Swal.fire({ title: 'লোড হচ্ছে...', didOpen: () => Swal.showLoading() });
-    
-    // লিমিট ব্যবহার করে শুধুমাত্র যারা বেশি টাকা দিয়েছে এমন ২০ জনকে আনবে
-    const userQuery = query(collection(db, "users"), orderBy("totalAmount", "desc"), limit(20));
-    const userSnap = await getDocs(userQuery);
-    
-    window.allUsersData = [];
-    userSnap.forEach(doc => window.allUsersData.push(doc.data()));
-    
-    Swal.close();
-    window.renderTable();
-}
-    
-    // যখন টার্গেট ট্যাবে ক্লিক করবে, তখন ডাটা টানবে
-    if(type === 'targets') {
-        btnT.className = "px-3 sm:px-4 py-1.5 rounded-md text-xs sm:text-sm font-semibold bg-white shadow text-emerald-700 transition";
-        titleText.innerHTML = '<i class="fas fa-bullseye text-amber-500 mr-2"></i> লক্ষ্যমাত্রা তালিকা';
-        
-        if (window.allPastTargets.length === 0) {
-            Swal.fire({ title: 'লোড হচ্ছে...', didOpen: () => Swal.showLoading() });
-            const targetSnap = await getDocs(query(collection(db, "past_targets"), orderBy("timestamp", "desc")));
-            window.allPastTargets = [];
-            targetSnap.forEach(doc => {
-                let data = doc.data(); data.id = doc.id;
-                window.allPastTargets.push(data);
-            });
-            Swal.close();
+            if(type === 'pending') {
+                btnP.className = "px-4 sm:px-6 py-2 rounded-lg text-xs sm:text-sm font-bold bg-white shadow-sm text-emerald-600 transition-all duration-300";
+                titleText.innerHTML = '<i class="fas fa-list-alt text-emerald-500 mr-2 drop-shadow-sm"></i> অনুদানের তালিকা';
+                window.renderTable();
+            }
+            else if(type === 'users') {
+                btnU.className = "px-4 sm:px-6 py-2 rounded-lg text-xs sm:text-sm font-bold bg-white shadow-sm text-blue-600 transition-all duration-300";
+                titleText.innerHTML = '<i class="fas fa-users text-blue-500 mr-2 drop-shadow-sm"></i> টপ ২০ দাতার তালিকা';
+                
+                Swal.fire({ title: 'লোড হচ্ছে...', didOpen: () => Swal.showLoading() });
+                const userQuery = query(collection(db, "users"), orderBy("totalAmount", "desc"), limit(20));
+                const userSnap = await getDocs(userQuery);
+                window.allUsersData = [];
+                userSnap.forEach(doc => window.allUsersData.push(doc.data()));
+                Swal.close();
+                window.renderTable();
+            }
+            else if(type === 'targets') {
+                btnT.className = "px-4 sm:px-6 py-2 rounded-lg text-xs sm:text-sm font-bold bg-white shadow-sm text-amber-500 transition-all duration-300";
+                titleText.innerHTML = '<i class="fas fa-bullseye text-amber-500 mr-2 drop-shadow-sm"></i> লক্ষ্যমাত্রা তালিকা';
+                
+                if (window.allPastTargets.length === 0) {
+                    Swal.fire({ title: 'লোড হচ্ছে...', didOpen: () => Swal.showLoading() });
+                    const targetSnap = await getDocs(query(collection(db, "past_targets"), orderBy("timestamp", "desc")));
+                    window.allPastTargets = [];
+                    targetSnap.forEach(doc => {
+                        let data = doc.data(); data.id = doc.id;
+                        window.allPastTargets.push(data);
+                    });
+                    Swal.close();
+                }
+                window.renderTable();
+            }
+            else if(type === 'expenses') {
+                btnE.className = "px-4 sm:px-6 py-2 rounded-lg text-xs sm:text-sm font-bold bg-white shadow-sm text-red-500 transition-all duration-300";
+                titleText.innerHTML = '<i class="fas fa-file-invoice-dollar text-red-500 mr-2 drop-shadow-sm"></i> খরচের তালিকা';
+                
+                Swal.fire({ title: 'লোড হচ্ছে...', didOpen: () => Swal.showLoading() });
+                const exSnap = await getDocs(query(collection(db, "expenses"), orderBy("timestamp", "desc")));
+                window.allExpensesData = [];
+                exSnap.forEach(doc => {
+                    let data = doc.data(); data.id = doc.id;
+                    window.allExpensesData.push(data);
+                });
+                Swal.close();
+                window.renderTable();
+            }
         }
-        window.renderTable();
-    }
-    // খরচের ট্যাব
-    if(type === 'expenses') {
-        btnE.className = "px-3 sm:px-4 py-1.5 rounded-md text-xs sm:text-sm font-semibold bg-white shadow text-red-700 transition";
-        titleText.innerHTML = '<i class="fas fa-file-invoice-dollar text-red-500 mr-2"></i> খরচের তালিকা';
-        
-        Swal.fire({ title: 'লোড হচ্ছে...', didOpen: () => Swal.showLoading() });
-        const exSnap = await getDocs(query(collection(db, "expenses"), orderBy("timestamp", "desc")));
-        window.allExpensesData = [];
-        exSnap.forEach(doc => {
-            let data = doc.data(); data.id = doc.id;
-            window.allExpensesData.push(data);
-        });
-        Swal.close();
-        window.renderTable();
-    }
-}
 
         // লগইন লজিক (ডাটাবেস + অফলাইন ফলব্যাক)
         window.checkLogin = async function() {
@@ -1244,6 +1444,7 @@ window.editUserProfile = async function(oldMobile) {
                 }
 
                 if(passInput === dbPass) {
+                    sessionStorage.setItem('adminLoggedIn', 'true'); // <-- এই লাইনটি যুক্ত হয়েছে
                     Swal.close();
                     document.getElementById('loginScreen').classList.add('hidden');
                     document.getElementById('dashboardScreen').classList.remove('hidden');
@@ -1251,15 +1452,15 @@ window.editUserProfile = async function(oldMobile) {
                     Swal.fire({ icon: 'error', title: 'ভুল পাসওয়ার্ড!', text: 'সঠিক পাসওয়ার্ড দিন।' });
                 }
             } catch (error) {
-                console.error("Firebase Auth Error: ", error); // কনসোলে আসল সমস্যা দেখাবে
+                console.error("Firebase Auth Error: ", error); 
                 
-                // Fail-safe: ডাটাবেস কানেক্ট না হলেও যদি ইউজার 12345 দেয়, তবে ঢুকতে দেওয়া হবে
+                // Fail-safe
                 if(passInput === '12345') {
+                    sessionStorage.setItem('adminLoggedIn', 'true'); // <-- এই লাইনটি যুক্ত হয়েছে
                     Swal.close();
                     document.getElementById('loginScreen').classList.add('hidden');
                     document.getElementById('dashboardScreen').classList.remove('hidden');
                     
-                    // ছোট করে একটি ওয়ার্নিং দেখানো যে ডাটাবেস কানেক্ট হয়নি
                     Swal.fire({
                         title: 'অফলাইন লগইন', 
                         text: 'ডাটাবেস কানেক্ট করা যায়নি, তাই ডিফল্ট পাসওয়ার্ড দিয়ে লগইন করা হয়েছে।', 
@@ -1270,13 +1471,13 @@ window.editUserProfile = async function(oldMobile) {
                         showConfirmButton: false
                     });
                 } else {
-                    // যদি 12345 না দিয়ে অন্য কিছু দেয় এবং ডাটাবেসও কানেক্ট না হয়
                     Swal.fire({ icon: 'error', title: 'কানেকশন এরর!', text: 'ডাটাবেসের সাথে যুক্ত হতে পারেনি।: ' + error.message });
                 }
             }
         }
 
         window.logout = function() {
+            sessionStorage.removeItem('adminLoggedIn'); // <-- এই লাইনটি যুক্ত হয়েছে
             document.getElementById('adminPass').value = '';
             document.getElementById('loginScreen').classList.remove('hidden');
             document.getElementById('dashboardScreen').classList.add('hidden');
@@ -1482,9 +1683,174 @@ window.downloadExcel = async function(sessionId, reason) {
         Swal.fire('ত্রুটি', 'এক্সেল ফাইল তৈরি করতে সমস্যা হয়েছে।', 'error');
     }
 };
-
 // ========================================================
-// আপডেট: সরাসরি ডাটাবেস থেকে টার্গেটের বিস্তারিত দেখা
+// আপডেট: ছবি হিসেবে ডাউনলোড (প্রোফাইল পিকচার সহ এবং ডিজাইন ফিক্সড)
+// ========================================================
+window.downloadImage = async function(sessionId, reason, targetAmount, totalRaised) {
+    Swal.fire({ title: 'ছবি তৈরি হচ্ছে...', text: 'অনুগ্রহ করে অপেক্ষা করুন', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+    try {
+        const q = query(collection(db, "donations"), where("targetSessionId", "==", sessionId), where("status", "==", "approved"));
+        const snapshot = await getDocs(q);
+
+        let targetDonations = [];
+        snapshot.forEach(doc => targetDonations.push(doc.data()));
+
+        if (targetDonations.length === 0) {
+            Swal.fire('দুঃখিত', 'ডাউনলোড করার মতো কোনো ডাটা নেই।', 'info');
+            return;
+        }
+
+        // সময়ের ভিত্তিতে সাজানো
+        targetDonations.sort((a, b) => b.timestamp.toMillis() - a.timestamp.toMillis());
+
+        // প্রতি পেজে (শিটে) ২০ জন করে ভাগ করা
+        const chunkSize = 20;
+        const chunks = [];
+        for (let i = 0; i < targetDonations.length; i += chunkSize) {
+            chunks.push(targetDonations.slice(i, i + chunkSize));
+        }
+
+        // ছবি রেন্ডার করার জন্য একটি গোপন (Hidden) কন্টেইনার তৈরি করা
+        const renderContainer = document.createElement('div');
+        renderContainer.style.position = 'absolute';
+        renderContainer.style.left = '-9999px';
+        renderContainer.style.top = '0';
+        renderContainer.style.width = '850px'; // একটু চওড়া করা হলো ছবির জন্য
+        renderContainer.style.backgroundColor = '#ffffff';
+        renderContainer.style.zIndex = '-1';
+        document.body.appendChild(renderContainer);
+
+        // ডিফল্ট ছবি (যার ছবি নেই তার জন্য)
+        const defaultAvatar = "https://i.ibb.co.com/20yk3FVc/3541871.png";
+
+        // প্রত্যেকটি অংশের জন্য আলাদা ছবি ডাউনলোড
+        for (let i = 0; i < chunks.length; i++) {
+            const chunk = chunks[i];
+            let listHtml = '';
+            
+            chunk.forEach((d, index) => {
+                const sn = (i * chunkSize) + index + 1;
+                const userPic = d.photo ? d.photo : defaultAvatar; // ছবি থাকলে সেটা, না থাকলে ডিফল্ট
+                
+                // মেথডের কালার কোড
+                let methodBg = "#f3f4f6", methodText = "#374151";
+                if(d.method === 'বিকাশ') { methodBg = "#fce7f3"; methodText = "#be185d"; }
+                else if(d.method === 'নগদ') { methodBg = "#ffedd5"; methodText = "#c2410c"; }
+                else if(d.method === 'রকেট') { methodBg = "#f3e8ff"; methodText = "#7e22ce"; }
+                else if(d.method === 'ক্যাশ') { methodBg = "#d1fae5"; methodText = "#047857"; }
+
+                listHtml += `
+                    <tr style="border-bottom: 1px solid #e5e7eb;">
+                        <td style="padding: 12px; text-align: center; color: #4b5563; font-size: 15px; vertical-align: middle;">${sn}</td>
+                        
+                        <!-- প্রোফাইল পিকচার এবং নাম -->
+                        <td style="padding: 12px; vertical-align: middle;">
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <img src="${userPic}" crossorigin="anonymous" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.1);" />
+                                <span style="font-weight: bold; color: #1f2937; font-size: 17px;">${d.name || 'অজ্ঞাত'}</span>
+                            </div>
+                        </td>
+
+                        <td style="padding: 12px; color: #6b7280; font-size: 15px; vertical-align: middle;">${d.mobile || ''}</td>
+                        
+                        <!-- মাধ্যম বা পেমেন্ট মেথড (ডিজাইন ফিক্সড) -->
+                        <td style="padding: 12px; text-align: center; vertical-align: middle;">
+                            <span style="display: inline-block; background: ${methodBg}; color: ${methodText}; padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: bold; line-height: 1;">${d.method}</span>
+                        </td>
+
+                        <td style="padding: 12px; font-weight: bold; color: #059669; text-align: right; font-size: 18px; vertical-align: middle;">৳${d.amount.toLocaleString('en-IN')}</td>
+                    </tr>
+                `;
+            });
+
+            // ছবির ভেতরের সম্পূর্ণ ডিজাইন (HTML/CSS)
+            renderContainer.innerHTML = `
+                <div id="capture-part-${i}" style="padding: 40px; font-family: 'Hind Siliguri', sans-serif; background: #f8fafc;">
+                    <!-- হেডার সেকশন -->
+                    <div style="text-align: center; margin-bottom: 25px; border-bottom: 3px solid #10b981; padding-bottom: 20px;">
+                        <div style="font-size: 30px; font-weight: bold; color: #047857;">কোনাগাঁতী কেন্দ্রীয় ঈদগাহ মাঠ উন্নয়ন তহবিল</div>
+                        <div style="font-size: 20px; font-weight: bold; color: #374151; margin-top: 8px;">${reason}</div>
+                    </div>
+
+                    <!-- টার্গেট ইনফরমেশন -->
+                    <div style="display: flex; justify-content: space-between; background: #eff6ff; padding: 20px; border-radius: 12px; border: 1px solid #bfdbfe; margin-bottom: 25px;">
+                        <div style="text-align: center; flex: 1; border-right: 1px solid #bfdbfe;">
+                            <div style="font-size: 15px; color: #6b7280; font-weight: bold;">লক্ষ্যমাত্রা (টার্গেট)</div>
+                            <div style="font-size: 28px; font-weight: bold; color: #1d4ed8; margin-top: 5px;">৳${targetAmount.toLocaleString('en-IN')}</div>
+                        </div>
+                        <div style="text-align: center; flex: 1;">
+                            <div style="font-size: 15px; color: #6b7280; font-weight: bold;">সর্বমোট সংগ্রহ হয়েছে</div>
+                            <div style="font-size: 28px; font-weight: bold; color: #059669; margin-top: 5px;">৳${totalRaised.toLocaleString('en-IN')}</div>
+                        </div>
+                    </div>
+
+                    <!-- টাইটেল -->
+                    <div style="font-size: 18px; font-weight: bold; color: #d97706; margin-bottom: 15px;">
+                        দাতাদের তালিকা (পর্ব ${i + 1} / ${chunks.length}):
+                    </div>
+
+                    <!-- টেবিল -->
+                    <table style="width: 100%; border-collapse: collapse; background: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e5e7eb;">
+                        <thead style="background: #10b981; color: #ffffff;">
+                            <tr>
+                                <th style="padding: 14px; text-align: center; width: 60px; font-size: 16px;">নং</th>
+                                <th style="padding: 14px; text-align: left; font-size: 16px;">দাতা</th>
+                                <th style="padding: 14px; text-align: left; font-size: 16px;">মোবাইল নম্বর</th>
+                                <th style="padding: 14px; text-align: center; font-size: 16px;">মাধ্যম</th>
+                                <th style="padding: 14px; text-align: right; font-size: 16px;">পরিমাণ (৳)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${listHtml}
+                        </tbody>
+                    </table>
+                    
+                    <!-- ফুটার -->
+                    <div style="text-align: center; margin-top: 35px; font-size: 15px; color: #9ca3af; font-weight: bold;">
+                        Powered by Eidgah Fund Management System
+                    </div>
+                </div>
+            `;
+
+            // ছবিগুলো ইন্টারনেট থেকে পুরোপুরি লোড হওয়ার জন্য ১.৫ সেকেন্ড অপেক্ষা করা
+            await new Promise(res => setTimeout(res, 1500));
+
+            // Html2Canvas দিয়ে ছবি কনভার্ট করা
+            const canvas = await html2canvas(document.getElementById(`capture-part-${i}`), {
+                scale: 2, // High resolution
+                useCORS: true, // cross-origin ছবি অ্যালাউ করার জন্য
+                backgroundColor: '#ffffff'
+            });
+
+            // ডাউনলোড ট্রিগার করা
+            const link = document.createElement('a');
+            link.download = `${reason}_Part_${i + 1}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+            
+            // একসাথে একাধিক ছবি ডাউনলোড হলে ব্রাউজার যেন ব্লক না করে সেজন্য একটু বিরতি দেওয়া
+            await new Promise(res => setTimeout(res, 800)); 
+        }
+
+        document.body.removeChild(renderContainer); // স্ক্রিন থেকে ক্লিন করে দেওয়া
+        Swal.close();
+        Swal.fire({
+            icon: 'success',
+            title: 'ডাউনলোড সম্পন্ন!',
+            text: chunks.length > 1 ? `মোট ${chunks.length} টি ছবি ডাউনলোড হয়েছে।` : 'ছবি সফলভাবে ডাউনলোড হয়েছে।',
+            timer: 3000,
+            showConfirmButton: true
+        });
+
+    } catch (error) {
+        console.error(error);
+        if(document.body.contains(renderContainer)) document.body.removeChild(renderContainer);
+        Swal.fire('ত্রুটি', 'ছবি তৈরি করতে সমস্যা হয়েছে। ইন্টারনেট কানেকশন চেক করুন।', 'error');
+    }
+};
+// ========================================================
+// আপডেট: সরাসরি ডাটাবেস থেকে টার্গেটের বিস্তারিত দেখা (ফিক্সড ভার্সন)
 // ========================================================
 window.viewTargetDetails = async function(sessionId, reason, targetAmount) {
     Swal.fire({ title: 'লোড হচ্ছে...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
@@ -1514,15 +1880,18 @@ window.viewTargetDetails = async function(sessionId, reason, targetAmount) {
                 
                 let methodColor = "bg-gray-100 text-gray-700";
                 if(d.method === 'বিকাশ') methodColor = "bg-pink-100 text-pink-700";
-                if(d.method === 'ন নগদ') methodColor = "bg-orange-100 text-orange-700";
+                // নগদের টাইপো ফিক্স করা হয়েছে:
+                if(d.method === 'নগদ') methodColor = "bg-orange-100 text-orange-700"; 
                 if(d.method === 'রকেট') methodColor = "bg-purple-100 text-purple-700";
                 if(d.method === 'ক্যাশ') methodColor = "bg-green-100 text-green-700";
 
                 listHtml += `
                     <div class="flex items-center p-2 border-b border-gray-100 hover:bg-gray-50 text-left transition">
                         ${avatar}
-                        <div class="ml-2 w-1/3">
-                            <div class="text-[12px] sm:text-sm font-bold text-gray-800 leading-tight truncate">${d.name}</div>
+                        <!-- নামের জায়গাটি কিছুটা বড় করা হয়েছে (w-[45%]) -->
+                        <div class="ml-2 w-[45%]">
+                            <!-- truncate ক্লাসটি বাদ দেওয়া হয়েছে, এখন পুরো নাম দেখাবে এবং বড় হলে নিচে নামবে -->
+                            <div class="text-[12px] sm:text-sm font-bold text-gray-800 leading-tight whitespace-normal break-words">${d.name}</div>
                             <div class="text-[9px] sm:text-xs text-gray-500">${d.mobile}</div>
                         </div>
                         <div class="flex-1 px-1 text-center">
@@ -1546,9 +1915,14 @@ window.viewTargetDetails = async function(sessionId, reason, targetAmount) {
             </div>
             <div class="flex justify-between items-center border-b border-gray-200 pb-2 mb-2">
                 <div class="text-left font-bold text-gray-700 text-sm"><i class="fas fa-users text-amber-500"></i> দাতাদের তালিকা:</div>
-                <button onclick="downloadExcel('${sessionId}', '${reason}')" class="text-emerald-700 bg-emerald-100 hover:bg-emerald-200 border border-emerald-200 px-3 py-1.5 rounded-md text-[11px] font-bold transition flex items-center gap-1 shadow-sm">
-                    <i class="fas fa-file-excel text-emerald-600"></i> Excel ডাউনলোড
-                </button>
+                <div class="flex gap-2">
+                    <button onclick="downloadImage('${sessionId}', '${reason}', ${targetAmount}, ${totalRaised})" class="text-blue-700 bg-blue-100 hover:bg-blue-200 border border-blue-200 px-3 py-1.5 rounded-md text-[11px] font-bold transition flex items-center gap-1 shadow-sm">
+                        <i class="fas fa-image text-blue-600"></i> ছবি ডাউনলোড
+                    </button>
+                    <button onclick="downloadExcel('${sessionId}', '${reason}')" class="text-emerald-700 bg-emerald-100 hover:bg-emerald-200 border border-emerald-200 px-3 py-1.5 rounded-md text-[11px] font-bold transition flex items-center gap-1 shadow-sm">
+                        <i class="fas fa-file-excel text-emerald-600"></i> Excel ডাউনলোড
+                    </button>
+                </div>
             </div>
             <div class="max-h-60 overflow-y-auto pr-1">${listHtml}</div>
         `;
@@ -1791,7 +2165,7 @@ await setDoc(doc(db, "users", mobile), userData);
                     photo: currentManualUser.photo,
                     amount: amount,
                     method: "ক্যাশ",
-                    trxId: "অ্যাডমিন এন্ট্রি (অফলাইন)",
+                    trxId: "অ্যাডমিন এন্ট্রি",
                     timestamp: new Date(),
                     status: "approved", // সরাসরি লিস্টে চলে যাবে
                     isTargetDonation: window.activeTargetInfo ? true : false,
@@ -1964,6 +2338,16 @@ await updateDoc(doc(db, "users", currentManualUser.mobile), {
                 }
             });
         }
+        // পেজ রিলোড হলে চেক করবে অ্যাডমিন আগে থেকে লগইন করা আছে কিনা
+        window.addEventListener('DOMContentLoaded', () => {
+            if (sessionStorage.getItem('adminLoggedIn') === 'true') {
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('dashboardScreen').classList.remove('hidden');
+            }
+        });
+        
+        
+        
     </script>
 </body>
 </html>
