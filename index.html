@@ -434,6 +434,14 @@
                         </tbody>
                     </table>
                 </div>
+                
+                <!-- নতুন যুক্ত করা See More বাটন -->
+                <div id="loadMoreContainer" class="hidden py-4 text-center bg-gray-50 border-t border-gray-100">
+                    <button onclick="loadMoreUsers()" id="btnLoadMore" class="bg-blue-50 hover:bg-blue-600 hover:text-white border border-blue-200 text-blue-600 px-6 py-2.5 rounded-xl font-bold transition-all duration-300 shadow-sm flex items-center justify-center gap-2 mx-auto">
+                        <i class="fas fa-chevron-down"></i> আরও দেখুন
+                    </button>
+                </div>
+
             </div>
         </div>
     </div>
@@ -441,7 +449,7 @@
     <!-- Firebase & Logic Scripts -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-import { getFirestore, collection, onSnapshot, query, orderBy, doc, updateDoc, deleteDoc, setDoc, getDocs, where, getDoc, increment, limit, getCountFromServer, addDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+import { getFirestore, collection, onSnapshot, query, orderBy, doc, updateDoc, deleteDoc, setDoc, getDocs, where, getDoc, increment, limit, getCountFromServer, addDoc, startAfter } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         // ==========================================
         // আপনার ফায়ারবেস Config
@@ -466,6 +474,8 @@ const firebaseConfig = {
         window.activeTargetInfo = null; 
         window.currentFilter = 'pending';
         window.allUsersData = [];
+window.lastVisibleUser = null; 
+window.hasMoreUsers = true;
 
         // ডাটাবেস থেকে শুধু Pending ডাটা ফেচিং (ইনডেক্স এরর ছাড়া)
         const q = query(collection(db, "donations"), where("status", "==", "pending")); 
@@ -571,7 +581,9 @@ onSnapshot(doc(db, "settings", "general_settings"), (docSnap) => {
             const thead = document.getElementById('adminTableHead');
             tbody.innerHTML = '';
             thead.innerHTML = '';
-
+if(document.getElementById('loadMoreContainer')) {
+                document.getElementById('loadMoreContainer').classList.add('hidden');
+            }
             // ---- PENDING TAB (Premium Design + Mobile Fit Fix) ----
             if (window.currentFilter === 'pending') {
                 // মডার্ন টেবিল হেডার (মোবাইলের জন্য প্যাডিং কমানো হয়েছে)
@@ -739,6 +751,10 @@ onSnapshot(doc(db, "settings", "general_settings"), (docSnap) => {
                     `;
                     tbody.appendChild(tr);
                 });
+                
+                if (window.hasMoreUsers && (!window.lastSearchTerm || window.lastSearchTerm === '')) {
+                    document.getElementById('loadMoreContainer').classList.remove('hidden');
+                }
             }
             // ---- TARGETS (SPLIT VIEW) TAB (Premium Design) ----
             else if (window.currentFilter === 'targets') {
@@ -1376,12 +1392,17 @@ window.editUserProfile = async function(oldMobile) {
             }
             else if(type === 'users') {
                 btnU.className = "px-4 sm:px-6 py-2 rounded-lg text-xs sm:text-sm font-bold bg-white shadow-sm text-blue-600 transition-all duration-300";
-                titleText.innerHTML = '<i class="fas fa-users text-blue-500 mr-2 drop-shadow-sm"></i> টপ ২০ দাতার তালিকা';
+                titleText.innerHTML = '<i class="fas fa-users text-blue-500 mr-2 drop-shadow-sm"></i> দাতার তালিকা';
                 
                 Swal.fire({ title: 'লোড হচ্ছে...', didOpen: () => Swal.showLoading() });
+                
                 const userQuery = query(collection(db, "users"), orderBy("totalAmount", "desc"), limit(20));
                 const userSnap = await getDocs(userQuery);
+                
                 window.allUsersData = [];
+                window.lastVisibleUser = userSnap.docs[userSnap.docs.length - 1]; 
+                window.hasMoreUsers = userSnap.docs.length === 20; 
+                
                 userSnap.forEach(doc => window.allUsersData.push(doc.data()));
                 Swal.close();
                 window.renderTable();
@@ -2219,7 +2240,7 @@ await updateDoc(doc(db, "users", currentManualUser.mobile), {
 
             try {
                 window.allUsersData = [];
-
+                window.hasMoreUsers = false;
                 if (isPhoneNumber) {
                     // --- মোবাইল নাম্বার দিয়ে খোঁজা (মাত্র ১টি Read) ---
                     let mobile = engInput.replace(/\D/g, ''); 
@@ -2345,7 +2366,43 @@ await updateDoc(doc(db, "users", currentManualUser.mobile), {
                 document.getElementById('dashboardScreen').classList.remove('hidden');
             }
         });
-        
+        window.loadMoreUsers = async function() {
+            if (!window.lastVisibleUser) return;
+
+            const btn = document.getElementById('btnLoadMore');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> লোড হচ্ছে...';
+            btn.disabled = true;
+
+            try {
+                const nextQuery = query(
+                    collection(db, "users"), 
+                    orderBy("totalAmount", "desc"), 
+                    startAfter(window.lastVisibleUser), 
+                    limit(20)
+                );
+                
+                const nextSnap = await getDocs(nextQuery);
+                
+                if (nextSnap.empty) {
+                    window.hasMoreUsers = false;
+                } else {
+                    window.lastVisibleUser = nextSnap.docs[nextSnap.docs.length - 1];
+                    window.hasMoreUsers = nextSnap.docs.length === 20;
+                    
+                    nextSnap.forEach(doc => {
+                        window.allUsersData.push(doc.data());
+                    });
+                }
+                
+                window.renderTable(); 
+            } catch (error) {
+                console.error(error);
+                Swal.fire('ত্রুটি', 'আরও ডাটা লোড করতে সমস্যা হয়েছে।', 'error');
+            }
+            
+            btn.innerHTML = '<i class="fas fa-chevron-down"></i> আরও দেখুন';
+            btn.disabled = false;
+        }
         
         
     </script>
